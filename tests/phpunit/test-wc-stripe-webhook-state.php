@@ -1,4 +1,10 @@
 <?php
+
+use \ElementorStripeEu\{
+	WC_Stripe_Webhook_State,
+	WC_Stripe_Webhook_Handler,
+};
+
 /**
  * These tests make assertions against class WC_Stripe_Webhook_State.
  *
@@ -46,11 +52,11 @@ class WC_Stripe_Webhook_State_Test extends WP_UnitTestCase {
 		$this->webhook_secret = 'whsec_123';
 
 		// Resets settings.
-		$stripe_settings                        = get_option( 'woocommerce_stripe_settings', [] );
+		$stripe_settings                        = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$stripe_settings['webhook_secret']      = $this->webhook_secret;
 		$stripe_settings['test_webhook_secret'] = $this->webhook_secret;
 		unset( $stripe_settings['testmode'] );
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
 		$this->wc_stripe_webhook_handler = new WC_Stripe_Webhook_Handler();
 	}
@@ -74,10 +80,10 @@ class WC_Stripe_Webhook_State_Test extends WP_UnitTestCase {
 	}
 
 	private function cleanup_webhook_secret() {
-		$stripe_settings = get_option( 'woocommerce_stripe_settings', [] );
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
 		unset( $stripe_settings['webhook_secret'] );
 		unset( $stripe_settings['test_webhook_secret'] );
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 		$this->wc_stripe_webhook_handler = new WC_Stripe_Webhook_Handler();
 	}
 
@@ -104,9 +110,9 @@ class WC_Stripe_Webhook_State_Test extends WP_UnitTestCase {
 	}
 
 	private function set_testmode( $testmode = 'yes' ) {
-		$stripe_settings             = get_option( 'woocommerce_stripe_settings', [] );
+		$stripe_settings             = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$stripe_settings['testmode'] = $testmode;
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 	}
 
 	/**

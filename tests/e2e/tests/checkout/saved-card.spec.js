@@ -44,7 +44,7 @@ test( 'customer can checkout with a saved card @smoke', async ( { page } ) => {
 		await fillCardDetails( page, config.get( 'cards.basic' ) );
 
 		// check box to save payment method.
-		await page.locator( '#wc-stripe-new-payment-method' ).click();
+		await page.locator( '#wc-stripe_eu-new-payment-method' ).click();
 
 		await page.locator( 'text=Place order' ).click();
 

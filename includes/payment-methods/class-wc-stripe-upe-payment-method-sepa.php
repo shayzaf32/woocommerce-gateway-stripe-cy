@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+use \ElementorStripeEu\WC_Stripe_UPE_Payment_Method;
 
 /**
  * SEPA Payment Method class extending UPE base class

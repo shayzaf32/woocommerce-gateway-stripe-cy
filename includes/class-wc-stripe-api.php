@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -39,7 +42,7 @@ class WC_Stripe_API {
 	 */
 	public static function get_secret_key() {
 		if ( ! self::$secret_key ) {
-			$options         = get_option( 'woocommerce_stripe_settings' );
+			$options         = get_option( 'woocommerce_stripe_eu_settings' );
 			$secret_key      = $options['secret_key'] ?? '';
 			$test_secret_key = $options['test_secret_key'] ?? '';
 
@@ -60,7 +63,7 @@ class WC_Stripe_API {
 	public static function get_user_agent() {
 		$app_info = [
 			'name'       => 'WooCommerce Stripe Gateway',
-			'version'    => WC_STRIPE_VERSION,
+			'version'    => WC_STRIPE_EU_VERSION,
 			'url'        => 'https://woocommerce.com/products/stripe/',
 			'partner_id' => 'pp_partner_EYuSt9peR0WTMg',
 		];

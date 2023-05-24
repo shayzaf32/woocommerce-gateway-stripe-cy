@@ -1,5 +1,7 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -13,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class    WC_Payment_Token_Link
  */
-class WC_Payment_Token_Link extends WC_Payment_Token {
+class WC_Payment_Token_Link extends \WC_Payment_Token {
 
 	/**
 	 * Stores payment type.

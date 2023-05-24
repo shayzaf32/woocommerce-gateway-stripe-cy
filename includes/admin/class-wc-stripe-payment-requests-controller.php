@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WC_Stripe_Payment_Requests_Controller {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ] );
-		add_action( 'wc_stripe_gateway_admin_options_wrapper', [ $this, 'admin_options' ] );
+		add_action( 'wc_stripe_eu_gateway_admin_options_wrapper', [ $this, 'admin_options' ] );
 	}
 
 	/**
@@ -19,16 +19,16 @@ class WC_Stripe_Payment_Requests_Controller {
 	 */
 	public function admin_scripts() {
 		// Webpack generates an assets file containing a dependencies array for our built JS file.
-		$script_asset_path = WC_STRIPE_PLUGIN_PATH . '/build/payment_requests_settings.asset.php';
+		$script_asset_path = WC_STRIPE_EU_PLUGIN_PATH . '/build/payment_requests_settings.asset.php';
 		$asset_metadata    = file_exists( $script_asset_path )
 			? require $script_asset_path
 			: [
 				'dependencies' => [],
-				'version'      => WC_STRIPE_VERSION,
+				'version'      => WC_STRIPE_EU_VERSION,
 			];
 		wp_register_script(
 			'wc-stripe-payment-request-settings',
-			plugins_url( 'build/payment_requests_settings.js', WC_STRIPE_MAIN_FILE ),
+			plugins_url( 'build/payment_requests_settings.js', WC_STRIPE_EU_MAIN_FILE ),
 			$asset_metadata['dependencies'],
 			$asset_metadata['version'],
 			true
@@ -41,7 +41,7 @@ class WC_Stripe_Payment_Requests_Controller {
 
 		wp_register_style(
 			'wc-stripe-payment-request-settings',
-			plugins_url( 'build/payment_requests_settings.css', WC_STRIPE_MAIN_FILE ),
+			plugins_url( 'build/payment_requests_settings.css', WC_STRIPE_EU_MAIN_FILE ),
 			[ 'wc-components' ],
 			$asset_metadata['version']
 		);

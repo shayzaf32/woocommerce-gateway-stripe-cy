@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! class_exists( 'WC_Abstract_Privacy' ) ) {
 	return;
 }
@@ -71,7 +74,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 		$user = get_user_by( 'email', $email_address ); // Check if user has an ID in the DB to load stored personal data.
 
 		$order_query = [
-			'payment_method' => [ 'stripe', 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
+			'payment_method' => [ 'stripe_eu', 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
 			'limit'          => 10,
 			'page'           => $page,
 		];
@@ -129,7 +132,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 						],
 						[
 							'name'  => __( 'Stripe customer id', 'woocommerce-gateway-stripe' ),
-							'value' => get_post_meta( $order->get_id(), '_stripe_customer_id', true ),
+							'value' => get_post_meta( $order->get_id(), WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ),
 						],
 					],
 				];
@@ -161,7 +164,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 			'relation' => 'AND',
 			[
 				'key'     => '_payment_method',
-				'value'   => [ 'stripe', 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
+				'value'   => [ 'stripe_eu', 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
 				'compare' => 'IN',
 			],
 			[
@@ -194,7 +197,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 						],
 						[
 							'name'  => __( 'Stripe customer id', 'woocommerce-gateway-stripe' ),
-							'value' => get_post_meta( $subscription->get_id(), '_stripe_customer_id', true ),
+							'value' => get_post_meta( $subscription->get_id(), WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ),
 						],
 					],
 				];
@@ -221,7 +224,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 		$data_to_export = [];
 
 		if ( $user instanceof WP_User ) {
-			$stripe_user = new WC_Stripe_Customer( $user->ID );
+			$stripe_user = new \ElementorStripeEu\WC_Stripe_Customer( $user->ID );
 
 			$data_to_export[] = [
 				'group_id'    => 'woocommerce_customer',
@@ -260,7 +263,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 		$stripe_source_id   = '';
 
 		if ( $user instanceof WP_User ) {
-			$stripe_customer_id = get_user_option( '_stripe_customer_id', $user->ID );
+			$stripe_customer_id = get_user_option( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, $user->ID );
 			$stripe_source_id   = get_user_option( '_stripe_source_id', $user->ID );
 		}
 
@@ -269,7 +272,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 
 		if ( ! empty( $stripe_customer_id ) || ! empty( $stripe_source_id ) ) {
 			$items_removed = true;
-			delete_user_option( $user->ID, '_stripe_customer_id' );
+			delete_user_option( $user->ID, WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
 			delete_user_option( $user->ID, '_stripe_source_id' );
 			$messages[] = __( 'Stripe User Data Erased.', 'woocommerce-gateway-stripe' );
 		}
@@ -360,12 +363,12 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 		foreach ( $renewal_orders as $renewal_order_id ) {
 			delete_post_meta( $renewal_order_id, '_stripe_source_id' );
 			delete_post_meta( $renewal_order_id, '_stripe_refund_id' );
-			delete_post_meta( $renewal_order_id, '_stripe_customer_id' );
+			delete_post_meta( $renewal_order_id, WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
 		}
 
 		delete_post_meta( $subscription_id, '_stripe_source_id' );
 		delete_post_meta( $subscription_id, '_stripe_refund_id' );
-		delete_post_meta( $subscription_id, '_stripe_customer_id' );
+		delete_post_meta( $subscription_id, WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
 
 		return [ true, false, [ __( 'Stripe Subscription Data Erased.', 'woocommerce-gateway-stripe' ) ] ];
 	}
@@ -380,7 +383,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 		$order_id           = $order->get_id();
 		$stripe_source_id   = get_post_meta( $order_id, '_stripe_source_id', true );
 		$stripe_refund_id   = get_post_meta( $order_id, '_stripe_refund_id', true );
-		$stripe_customer_id = get_post_meta( $order_id, '_stripe_customer_id', true );
+		$stripe_customer_id = get_post_meta( $order_id, WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true );
 
 		if ( ! $this->is_retention_expired( $order->get_date_created()->getTimestamp() ) ) {
 			/* translators: %d Order ID */
@@ -393,7 +396,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 
 		delete_post_meta( $order_id, '_stripe_source_id' );
 		delete_post_meta( $order_id, '_stripe_refund_id' );
-		delete_post_meta( $order_id, '_stripe_customer_id' );
+		delete_post_meta( $order_id, WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
 
 		return [ true, false, [ __( 'Stripe personal data erased.', 'woocommerce-gateway-stripe' ) ] ];
 	}

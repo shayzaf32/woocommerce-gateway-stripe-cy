@@ -1,5 +1,7 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -39,21 +41,21 @@ class WC_Stripe_UPE_Compatibility_Controller {
 				[
 					'name'         => 'WordPress',
 					'version'      => get_bloginfo( 'version' ),
-					'is_supported' => WC_Stripe_UPE_Compatibility::is_wp_supported(),
+					'is_supported' => \WC_Stripe_EU_UPE_Compatibility::is_wp_supported(),
 					/* translators: %s. WordPress version installed. */
-					'message'      => sprintf( __( 'WordPress %s or greater', 'woocommerce-gateway-stripe' ), WC_Stripe_UPE_Compatibility::MIN_WP_VERSION ),
+					'message'      => sprintf( __( 'WordPress %s or greater', 'woocommerce-gateway-stripe' ), \WC_Stripe_EU_UPE_Compatibility::MIN_WP_VERSION ),
 				],
 				[
 					'name'         => 'WooCommerce',
 					'version'      => $this->get_wc_version(),
-					'is_supported' => version_compare( $this->get_wc_version(), WC_Stripe_UPE_Compatibility::MIN_WC_VERSION, '>=' ),
+					'is_supported' => version_compare( $this->get_wc_version(), \WC_Stripe_EU_UPE_Compatibility::MIN_WC_VERSION, '>=' ),
 					'message'      => sprintf(
 					/* translators: %s. WooCommerce version installed. */
 						__(
 							'WooCommerce %s or greater to be installed and active',
 							'woocommerce-gateway-stripe'
 						),
-						WC_Stripe_UPE_Compatibility::MIN_WC_VERSION
+						\WC_Stripe_EU_UPE_Compatibility::MIN_WC_VERSION
 					),
 				],
 			],

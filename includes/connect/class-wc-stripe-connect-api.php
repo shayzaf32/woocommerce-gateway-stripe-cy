@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -7,7 +10,7 @@ if ( ! defined( 'WOOCOMMERCE_CONNECT_SERVER_URL' ) ) {
 	define( 'WOOCOMMERCE_CONNECT_SERVER_URL', 'https://api.woocommerce.com/' );
 }
 
-if ( ! class_exists( 'WC_Stripe_Connect_API' ) ) {
+if ( ! class_exists( '\ElementorStripeEu\WC_Stripe_Connect_API' ) ) {
 	/**
 	 * Stripe Connect API class.
 	 */
@@ -211,7 +214,7 @@ if ( ! class_exists( 'WC_Stripe_Connect_API' ) ) {
 					'base_state'     => WC()->countries->get_base_state(),
 					'base_postcode'  => WC()->countries->get_base_postcode(),
 					'currency'       => get_woocommerce_currency(),
-					'stripe_version' => WC_STRIPE_VERSION,
+					'stripe_version' => WC_STRIPE_EU_VERSION,
 					'wc_version'     => WC()->version,
 					'wp_version'     => get_bloginfo( 'version' ),
 				]

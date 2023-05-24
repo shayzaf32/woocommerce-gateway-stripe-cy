@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -6,13 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Base for Failed Renewal/Pre-Order Authentication Notifications.
  *
- * @extends WC_Email
+ * @extends \WC_Email
  */
-abstract class WC_Stripe_Email_Failed_Authentication extends WC_Email {
+abstract class WC_Stripe_Email_Failed_Authentication extends \WC_Email {
 	/**
 	 * An instance of the email, which would normally be sent after a failed payment.
 	 *
-	 * @var WC_Email
+	 * @var \WC_Email
 	 */
 	public $original_email;
 
@@ -65,7 +68,7 @@ abstract class WC_Stripe_Email_Failed_Authentication extends WC_Email {
 	/**
 	 * Generates the URL, which will be used to authenticate the payment.
 	 *
-	 * @param WC_Order $order The order whose payment needs authentication.
+	 * @param \WC_Order $order The order whose payment needs authentication.
 	 * @return string
 	 */
 	public function get_authorization_url( $order ) {
@@ -96,7 +99,7 @@ abstract class WC_Stripe_Email_Failed_Authentication extends WC_Email {
 	/**
 	 * Triggers the email.
 	 *
-	 * @param WC_Order $order The renewal order whose payment failed.
+	 * @param \WC_Order $order The renewal order whose payment failed.
 	 */
 	public function trigger( $order ) {
 		if ( ! $this->is_enabled() ) {

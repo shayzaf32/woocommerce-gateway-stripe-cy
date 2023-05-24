@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use Automattic\WooCommerce\Blocks\Payments\PaymentResult;
 use Automattic\WooCommerce\Blocks\Payments\PaymentContext;
@@ -16,7 +19,7 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 *
 	 * @var string
 	 */
-	protected $name = 'stripe';
+	protected $name = 'stripe_eu';
 
 	/**
 	 * The Payment Request configuration class used for Shortcode PRBs. We use it here to retrieve
@@ -42,7 +45,7 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 * Initializes the payment method type.
 	 */
 	public function initialize() {
-		$this->settings = get_option( 'woocommerce_stripe_settings', [] );
+		$this->settings = get_option( 'woocommerce_stripe_eu_settings', [] );
 	}
 
 	/**
@@ -62,7 +65,7 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	public function get_payment_method_script_handles() {
 		// Ensure Stripe JS is enqueued
 		wp_register_script(
-			'stripe',
+			'stripe_eu',
 			'https://js.stripe.com/v3/',
 			[],
 			'3.0',
@@ -82,8 +85,8 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 * Registers the UPE JS scripts.
 	 */
 	private function register_upe_payment_method_script_handles() {
-		$asset_path   = WC_STRIPE_PLUGIN_PATH . '/build/upe_blocks.asset.php';
-		$version      = WC_STRIPE_VERSION;
+		$asset_path   = WC_STRIPE_EU_PLUGIN_PATH . '/build/upe_blocks.asset.php';
+		$version      = WC_STRIPE_EU_VERSION;
 		$dependencies = [];
 		if ( file_exists( $asset_path ) ) {
 			$asset        = require $asset_path;
@@ -97,15 +100,15 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 
 		wp_enqueue_style(
 			'wc-stripe-blocks-checkout-style',
-			WC_STRIPE_PLUGIN_URL . '/build/upe_blocks.css',
+			WC_STRIPE_EU_PLUGIN_URL . '/build/upe_blocks.css',
 			[],
 			$version
 		);
 
 		wp_register_script(
 			'wc-stripe-blocks-integration',
-			WC_STRIPE_PLUGIN_URL . '/build/upe_blocks.js',
-			array_merge( [ 'stripe' ], $dependencies ),
+			WC_STRIPE_EU_PLUGIN_URL . '/build/upe_blocks.js',
+			array_merge( [ 'stripe_eu' ], $dependencies ),
 			$version,
 			true
 		);
@@ -119,8 +122,8 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 * Registers the classic JS scripts.
 	 */
 	private function register_legacy_payment_method_script_handles() {
-		$asset_path   = WC_STRIPE_PLUGIN_PATH . '/build/index.asset.php';
-		$version      = WC_STRIPE_VERSION;
+		$asset_path   = WC_STRIPE_EU_PLUGIN_PATH . '/build/index.asset.php';
+		$version      = WC_STRIPE_EU_VERSION;
 		$dependencies = [];
 		if ( file_exists( $asset_path ) ) {
 			$asset        = require $asset_path;
@@ -133,8 +136,8 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 		}
 		wp_register_script(
 			'wc-stripe-blocks-integration',
-			WC_STRIPE_PLUGIN_URL . '/build/index.js',
-			array_merge( [ 'stripe' ], $dependencies ),
+			WC_STRIPE_EU_PLUGIN_URL . '/build/index.js',
+			array_merge( [ 'stripe_eu' ], $dependencies ),
 			$version,
 			true
 		);
@@ -227,12 +230,12 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 		$js_configuration = [];
 
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
-		if ( isset( $gateways['stripe'] ) ) {
-			$js_configuration = $gateways['stripe']->javascript_params();
+		if ( isset( $gateways['stripe_eu'] ) ) {
+			$js_configuration = $gateways['stripe_eu']->javascript_params();
 		}
 
 		return apply_filters(
-			'wc_stripe_params',
+			'wc_stripe_eu_params',
 			$js_configuration
 		);
 	}
@@ -244,7 +247,7 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 */
 	private function get_payment_request_javascript_params() {
 		return apply_filters(
-			'wc_stripe_payment_request_params',
+			'wc_stripe_eu_payment_request_params',
 			$this->payment_request_configuration->javascript_params()
 		);
 	}
@@ -289,30 +292,30 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	private function get_icons() {
 		$icons_src = [
 			'visa'       => [
-				'src' => WC_STRIPE_PLUGIN_URL . '/assets/images/visa.svg',
+				'src' => WC_STRIPE_EU_PLUGIN_URL . '/assets/images/visa.svg',
 				'alt' => __( 'Visa', 'woocommerce-gateway-stripe' ),
 			],
 			'amex'       => [
-				'src' => WC_STRIPE_PLUGIN_URL . '/assets/images/amex.svg',
+				'src' => WC_STRIPE_EU_PLUGIN_URL . '/assets/images/amex.svg',
 				'alt' => __( 'American Express', 'woocommerce-gateway-stripe' ),
 			],
 			'mastercard' => [
-				'src' => WC_STRIPE_PLUGIN_URL . '/assets/images/mastercard.svg',
+				'src' => WC_STRIPE_EU_PLUGIN_URL . '/assets/images/mastercard.svg',
 				'alt' => __( 'Mastercard', 'woocommerce-gateway-stripe' ),
 			],
 		];
 
 		if ( 'USD' === get_woocommerce_currency() ) {
 			$icons_src['discover'] = [
-				'src' => WC_STRIPE_PLUGIN_URL . '/assets/images/discover.svg',
+				'src' => WC_STRIPE_EU_PLUGIN_URL . '/assets/images/discover.svg',
 				'alt' => _x( 'Discover', 'Name of credit card', 'woocommerce-gateway-stripe' ),
 			];
 			$icons_src['jcb']      = [
-				'src' => WC_STRIPE_PLUGIN_URL . '/assets/images/jcb.svg',
+				'src' => WC_STRIPE_EU_PLUGIN_URL . '/assets/images/jcb.svg',
 				'alt' => __( 'JCB', 'woocommerce-gateway-stripe' ),
 			];
 			$icons_src['diners']   = [
-				'src' => WC_STRIPE_PLUGIN_URL . '/assets/images/diners.svg',
+				'src' => WC_STRIPE_EU_PLUGIN_URL . '/assets/images/diners.svg',
 				'alt' => __( 'Diners', 'woocommerce-gateway-stripe' ),
 			];
 		}
@@ -328,14 +331,14 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 */
 	public function add_payment_request_order_meta( PaymentContext $context, PaymentResult &$result ) {
 		$data = $context->payment_data;
-		if ( ! empty( $data['payment_request_type'] ) && 'stripe' === $context->payment_method ) {
+		if ( ! empty( $data['payment_request_type'] ) && 'stripe_eu' === $context->payment_method ) {
 			$this->add_order_meta( $context->order, $data['payment_request_type'] );
 		}
 
 		// hook into stripe error processing so that we can capture the error to
 		// payment details (which is added to notices and thus not helpful for
 		// this context).
-		if ( 'stripe' === $context->payment_method ) {
+		if ( 'stripe_eu' === $context->payment_method ) {
 			add_action(
 				'wc_gateway_stripe_process_payment_error',
 				function( $error ) use ( &$result ) {
@@ -358,7 +361,7 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 * @param PaymentResult  $result  Result object for the payment.
 	 */
 	public function add_stripe_intents( PaymentContext $context, PaymentResult &$result ) {
-		if ( 'stripe' === $context->payment_method
+		if ( 'stripe_eu' === $context->payment_method
 			&& (
 				! empty( $result->payment_details['payment_intent_secret'] )
 				|| ! empty( $result->payment_details['setup_intent_secret'] )
@@ -413,8 +416,8 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 	 */
 	public function get_supported_features() {
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
-		if ( isset( $gateways['stripe'] ) ) {
-			$gateway = $gateways['stripe'];
+		if ( isset( $gateways['stripe_eu'] ) ) {
+			$gateway = $gateways['stripe_eu'];
 			return array_filter( $gateway->supports, [ $gateway, 'supports' ] );
 		}
 		return [];

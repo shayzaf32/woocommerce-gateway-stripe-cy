@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -22,7 +25,7 @@ class WC_Stripe_Feature_Flags {
 	 * @return bool
 	 */
 	public static function is_upe_checkout_enabled() {
-		$stripe_settings = get_option( 'woocommerce_stripe_settings', null );
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', null );
 		return ! empty( $stripe_settings[ self::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] )
 			&& 'yes' === $stripe_settings[ self::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ];
 	}
@@ -33,7 +36,7 @@ class WC_Stripe_Feature_Flags {
 	 * @return bool
 	 */
 	public static function did_merchant_disable_upe() {
-		$stripe_settings = get_option( 'woocommerce_stripe_settings', null );
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', null );
 		return ! empty( $stripe_settings[ self::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] ) && 'disabled' === $stripe_settings[ self::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ];
 	}
 }

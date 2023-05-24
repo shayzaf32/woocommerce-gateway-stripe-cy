@@ -5,6 +5,8 @@
  * @package WooCommerce_Stripe/Tests/WC_REST_Stripe_Account_Keys_Controller
  */
 
+use \ElementorStripeEu\WC_REST_Stripe_Account_Keys_Controller;
+
 /**
  * WC_REST_Stripe_Account_Keys_Controller unit tests.
  */
@@ -31,12 +33,12 @@ class WC_REST_Stripe_Account_Keys_Controller_Test extends WP_UnitTestCase {
 		wp_set_current_user( 1 );
 
 		// Setup existing keys
-		$settings                         = get_option( 'woocommerce_stripe_settings' );
+		$settings                         = get_option( 'woocommerce_stripe_eu_settings' );
 		$settings['publishable_key']      = 'original-live-key-9999';
 		$settings['test_publishable_key'] = 'original-test-key-9999';
-		update_option( 'woocommerce_stripe_settings', $settings );
+		update_option( 'woocommerce_stripe_eu_settings', $settings );
 
-		$mock_account = $this->getMockBuilder( WC_Stripe_Account::class )
+		$mock_account = $this->getMockBuilder( \ElementorStripeEu\WC_Stripe_Account::class )
 							 ->disableOriginalConstructor()
 							 ->getMock();
 
@@ -73,7 +75,7 @@ class WC_REST_Stripe_Account_Keys_Controller_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 200, $response->get_status() );
 
-		$settings = get_option( 'woocommerce_stripe_settings' );
+		$settings = get_option( 'woocommerce_stripe_eu_settings' );
 
 		$this->assertEquals( 'pk_live-key-12345', $settings['publishable_key'] );
 		$this->assertEquals( 'sk_live_secret-key-12345', $settings['secret_key'] );
@@ -96,7 +98,7 @@ class WC_REST_Stripe_Account_Keys_Controller_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 200, $response->get_status() );
 
-		$settings = get_option( 'woocommerce_stripe_settings' );
+		$settings = get_option( 'woocommerce_stripe_eu_settings' );
 
 		$this->assertEquals( 'pk_test-live-key-12345', $settings['test_publishable_key'] );
 		$this->assertEquals( 'sk_test-secret-key-12345', $settings['test_secret_key'] );
@@ -117,7 +119,7 @@ class WC_REST_Stripe_Account_Keys_Controller_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 200, $response->get_status() );
 
-		$settings = get_option( 'woocommerce_stripe_settings' );
+		$settings = get_option( 'woocommerce_stripe_eu_settings' );
 
 		$this->assertEquals( 'pk_live-key-12345', $settings['publishable_key'] );
 		// Other settings do not change and do not get erased.
@@ -135,7 +137,7 @@ class WC_REST_Stripe_Account_Keys_Controller_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 200, $response->get_status() );
 
-		$settings = get_option( 'woocommerce_stripe_settings' );
+		$settings = get_option( 'woocommerce_stripe_eu_settings' );
 
 		$this->assertEquals( '', $settings['publishable_key'] );
 		// Other settings do not change and do not get erased.

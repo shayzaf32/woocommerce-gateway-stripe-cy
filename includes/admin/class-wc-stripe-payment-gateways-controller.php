@@ -17,7 +17,7 @@ class WC_Stripe_Payment_Gateways_Controller {
 	 */
 	public function __construct() {
 		// If UPE is enabled and there are enabled payment methods, we need to load the disable Stripe confirmation modal.
-		$stripe_settings              = get_option( 'woocommerce_stripe_settings', [] );
+		$stripe_settings              = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$enabled_upe_payment_methods  = isset( $stripe_settings['upe_checkout_experience_accepted_payments'] ) ? $stripe_settings['upe_checkout_experience_accepted_payments'] : [];
 		$upe_payment_requests_enabled = 'yes' === $stripe_settings['payment_request'];
 
@@ -28,28 +28,28 @@ class WC_Stripe_Payment_Gateways_Controller {
 	}
 
 	public function register_payments_scripts() {
-		$payment_gateways_script_asset_path = WC_STRIPE_PLUGIN_PATH . '/build/payment_gateways.asset.php';
+		$payment_gateways_script_asset_path = WC_STRIPE_EU_PLUGIN_PATH . '/build/payment_gateways.asset.php';
 		$payment_gateways_script_asset      = file_exists( $payment_gateways_script_asset_path )
 			? require_once $payment_gateways_script_asset_path
 			: [
 				'dependencies' => [],
-				'version'      => WC_STRIPE_VERSION,
+				'version'      => WC_STRIPE_EU_VERSION,
 			];
 
 		wp_register_script(
-			'woocommerce_stripe_payment_gateways_page',
-			plugins_url( 'build/payment_gateways.js', WC_STRIPE_MAIN_FILE ),
+			'woocommerce_stripe_eu_payment_gateways_page',
+			plugins_url( 'build/payment_gateways.js', WC_STRIPE_EU_MAIN_FILE ),
 			$payment_gateways_script_asset['dependencies'],
 			$payment_gateways_script_asset['version'],
 			true
 		);
 		wp_set_script_translations(
-			'woocommerce_stripe_payment_gateways_page',
+			'woocommerce_stripe_eu_payment_gateways_page',
 			'woocommerce-gateway-stripe'
 		);
 		wp_register_style(
-			'woocommerce_stripe_payment_gateways_page',
-			plugins_url( 'build/payment_gateways.css', WC_STRIPE_MAIN_FILE ),
+			'woocommerce_stripe_eu_payment_gateways_page',
+			plugins_url( 'build/payment_gateways.css', WC_STRIPE_EU_MAIN_FILE ),
 			[ 'wc-components' ],
 			$payment_gateways_script_asset['version']
 		);
@@ -67,8 +67,8 @@ class WC_Stripe_Payment_Gateways_Controller {
 		);
 
 		if ( $is_payment_methods_page ) {
-			wp_enqueue_script( 'woocommerce_stripe_payment_gateways_page' );
-			wp_enqueue_style( 'woocommerce_stripe_payment_gateways_page' );
+			wp_enqueue_script( 'woocommerce_stripe_eu_payment_gateways_page' );
+			wp_enqueue_style( 'woocommerce_stripe_eu_payment_gateways_page' );
 		}
 	}
 

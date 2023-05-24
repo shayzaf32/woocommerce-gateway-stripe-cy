@@ -1,5 +1,7 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -25,7 +27,7 @@ class WC_Stripe_Settings_Controller {
 	public function __construct( WC_Stripe_Account $account ) {
 		$this->account = $account;
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ] );
-		add_action( 'wc_stripe_gateway_admin_options_wrapper', [ $this, 'admin_options' ] );
+		add_action( 'wc_stripe_eu_gateway_admin_options_wrapper', [ $this, 'admin_options' ] );
 	}
 
 	/**
@@ -57,7 +59,7 @@ class WC_Stripe_Settings_Controller {
 		}
 
 		// TODO: refactor this to a regex approach, we will need to touch `should_enqueue_in_current_tab_section` to support it
-		if ( ! ( WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'checkout', 'stripe' )
+		if ( ! ( WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'checkout', 'stripe_eu' )
 			|| WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'checkout', 'stripe_sepa' )
 			|| WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'checkout', 'stripe_giropay' )
 			|| WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'checkout', 'stripe_ideal' )
@@ -75,29 +77,29 @@ class WC_Stripe_Settings_Controller {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		// Webpack generates an assets file containing a dependencies array for our built JS file.
-		$script_asset_path = WC_STRIPE_PLUGIN_PATH . '/build/upe_settings.asset.php';
+		$script_asset_path = WC_STRIPE_EU_PLUGIN_PATH . '/build/upe_settings.asset.php';
 		$script_asset      = file_exists( $script_asset_path )
 			? require $script_asset_path
 			: [
 				'dependencies' => [],
-				'version'      => WC_STRIPE_VERSION,
+				'version'      => WC_STRIPE_EU_VERSION,
 			];
 
 		wp_register_script(
-			'woocommerce_stripe_admin',
-			plugins_url( 'build/upe_settings.js', WC_STRIPE_MAIN_FILE ),
+			'woocommerce_stripe_eu_admin',
+			plugins_url( 'build/upe_settings.js', WC_STRIPE_EU_MAIN_FILE ),
 			$script_asset['dependencies'],
 			$script_asset['version'],
 			true
 		);
 		wp_register_style(
-			'woocommerce_stripe_admin',
-			plugins_url( 'build/upe_settings.css', WC_STRIPE_MAIN_FILE ),
+			'woocommerce_stripe_eu_admin',
+			plugins_url( 'build/upe_settings.css', WC_STRIPE_EU_MAIN_FILE ),
 			[ 'wc-components' ],
 			$script_asset['version']
 		);
 
-		$oauth_url = woocommerce_gateway_stripe()->connect->get_oauth_url();
+		$oauth_url = woocommerce_gateway_stripe_eu()->connect->get_oauth_url();
 		if ( is_wp_error( $oauth_url ) ) {
 			$oauth_url = '';
 		}
@@ -116,16 +118,16 @@ class WC_Stripe_Settings_Controller {
 			'stripe_oauth_url'        => $oauth_url,
 		];
 		wp_localize_script(
-			'woocommerce_stripe_admin',
+			'woocommerce_stripe_eu_admin',
 			'wc_stripe_settings_params',
 			$params
 		);
 		wp_set_script_translations(
-			'woocommerce_stripe_admin',
+			'woocommerce_stripe_eu_admin',
 			'woocommerce-gateway-stripe'
 		);
 
-		wp_enqueue_script( 'woocommerce_stripe_admin' );
-		wp_enqueue_style( 'woocommerce_stripe_admin' );
+		wp_enqueue_script( 'woocommerce_stripe_eu_admin' );
+		wp_enqueue_style( 'woocommerce_stripe_eu_admin' );
 	}
 }

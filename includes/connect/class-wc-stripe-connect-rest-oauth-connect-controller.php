@@ -1,5 +1,7 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }

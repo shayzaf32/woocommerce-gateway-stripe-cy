@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -33,7 +36,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 	 */
 	public function __construct() {
 		$this->retry_interval = 2;
-		$stripe_settings      = get_option( 'woocommerce_stripe_settings', [] );
+		$stripe_settings      = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$this->testmode       = ( ! empty( $stripe_settings['testmode'] ) && 'yes' === $stripe_settings['testmode'] ) ? true : false;
 		$secret_key           = ( $this->testmode ? 'test_' : '' ) . 'webhook_secret';
 		$this->secret         = ! empty( $stripe_settings[ $secret_key ] ) ? $stripe_settings[ $secret_key ] : false;
@@ -225,8 +228,8 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 			if ( ! empty( $response->error ) ) {
 				// Customer param wrong? The user may have been deleted on stripe's end. Remove customer_id. Can be retried without.
 				if ( $this->is_no_such_customer_error( $response->error ) ) {
-					delete_user_option( $order->get_customer_id(), '_stripe_customer_id' );
-					$order->delete_meta_data( '_stripe_customer_id' );
+					delete_user_option( $order->get_customer_id(), WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
+					$order->delete_meta_data( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
 					$order->save();
 				}
 
@@ -384,7 +387,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 			return;
 		}
 
-		if ( 'stripe' === $order->get_payment_method() ) {
+		if ( 'stripe_eu' === $order->get_payment_method() ) {
 			$charge   = $order->get_transaction_id();
 			$captured = $order->get_meta( '_stripe_charge_captured', true );
 
@@ -522,7 +525,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 		}
 
 		// Don't proceed if payment method isn't Stripe.
-		if ( 'stripe' !== $order->get_payment_method() ) {
+		if ( 'stripe_eu' !== $order->get_payment_method() ) {
 			WC_Stripe_Logger::log( 'Canceled webhook abort: Order was not processed by Stripe: ' . $order->get_id() );
 			return;
 		}
@@ -554,7 +557,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 
 		$order_id = $order->get_id();
 
-		if ( 'stripe' === $order->get_payment_method() ) {
+		if ( 'stripe_eu' === $order->get_payment_method() ) {
 			$charge        = $order->get_transaction_id();
 			$captured      = $order->get_meta( '_stripe_charge_captured' );
 			$refund_id     = $order->get_meta( '_stripe_refund_id' );
@@ -630,7 +633,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 
 		$order_id = $order->get_id();
 
-		if ( 'stripe' === $order->get_payment_method() ) {
+		if ( 'stripe_eu' === $order->get_payment_method() ) {
 			$charge     = $order->get_transaction_id();
 			$refund_id  = $order->get_meta( '_stripe_refund_id' );
 			$currency   = $order->get_currency();

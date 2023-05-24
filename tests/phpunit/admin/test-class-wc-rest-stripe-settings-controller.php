@@ -19,7 +19,7 @@ class WC_REST_Stripe_Settings_Controller_Test extends WP_UnitTestCase {
 	/**
 	 * Gateway instance that the controller uses.
 	 *
-	 * @var WC_Gateway_Stripe
+	 * @var \ElementorStripeEu\WC_Gateway_Stripe_Eu
 	 */
 	private static $gateway;
 
@@ -41,7 +41,7 @@ class WC_REST_Stripe_Settings_Controller_Test extends WP_UnitTestCase {
 		update_option( '_wcstripe_feature_upe', 'yes' );
 		$upe_helper->enable_upe();
 		$upe_helper->reload_payment_gateways();
-		self::$gateway = WC()->payment_gateways()->payment_gateways()[ WC_Gateway_Stripe::ID ];
+		self::$gateway = WC()->payment_gateways()->payment_gateways()[ \ElementorStripeEu\WC_Gateway_Stripe_Eu::ID ];
 	}
 
 	/**
@@ -229,7 +229,7 @@ class WC_REST_Stripe_Settings_Controller_Test extends WP_UnitTestCase {
 
 	public function test_get_settings_returns_available_payment_method_ids() {
 		//link is available only in US
-		WC_Stripe::get_instance()->account = $this->getMockBuilder( 'WC_Stripe_Account' )
+		WC_Stripe::get_instance()->account = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Account' )
 													->disableOriginalConstructor()
 													->setMethods(
 														[
@@ -409,7 +409,7 @@ class WC_REST_Stripe_Settings_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @return WC_Gateway_Stripe
+	 * @return \ElementorStripeEu\WC_Gateway_Stripe_Eu
 	 */
 	private function get_gateway() {
 		return self::$gateway;

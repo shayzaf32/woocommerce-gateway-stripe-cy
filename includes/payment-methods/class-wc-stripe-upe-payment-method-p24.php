@@ -3,6 +3,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \ElementorStripeEu\WC_Stripe_UPE_Payment_Method;
+
 /**
  * Przelewy24 Payment Method class extending UPE base class
  */

@@ -3,10 +3,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \ElementorStripeEu\WC_Stripe_Exception;
+use \ElementorStripeEu\WC_Gateway_Stripe_Eu;
+
 /**
  * Class that handles Boleto payment method.
  *
- * @extends WC_Gateway_Stripe
+ * @extends WC_Gateway_Stripe_Eu
  *
  * @since 5.8.0
  */
@@ -128,7 +131,7 @@ class WC_Gateway_Stripe_Boleto extends WC_Stripe_Payment_Gateway_Voucher {
 		}
 
 		parent::payment_scripts();
-		wp_enqueue_script( 'jquery-mask', plugins_url( 'assets/js/jquery.mask.min.js', WC_STRIPE_MAIN_FILE ), [], WC_STRIPE_VERSION );
+		wp_enqueue_script( 'jquery-mask', plugins_url( 'assets/js/jquery.mask.min.js', WC_STRIPE_EU_MAIN_FILE ), [], WC_STRIPE_EU_VERSION );
 	}
 
 	/**

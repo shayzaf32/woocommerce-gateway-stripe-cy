@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -101,7 +104,7 @@ class WC_Stripe_Account {
 	 * @return string Transient key of test mode when testmode is enabled, otherwise returns the key of live mode.
 	 */
 	private function get_transient_key() {
-		$settings_options = get_option( 'woocommerce_stripe_settings', [] );
+		$settings_options = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$key              = isset( $settings_options['testmode'] ) && 'yes' === $settings_options['testmode'] ? self::TEST_ACCOUNT_OPTION : self::LIVE_ACCOUNT_OPTION;
 
 		return $key;

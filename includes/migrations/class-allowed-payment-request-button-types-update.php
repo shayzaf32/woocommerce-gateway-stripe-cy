@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class Allowed_Payment_Request_Button_Types_Update
  */
@@ -10,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * Remaps deprecated payment request button types to fallback values.
  *
- * @since 5.6.0
+ * @since 5.6.0w
  */
 class Allowed_Payment_Request_Button_Types_Update {
 	/**
@@ -76,6 +79,6 @@ class Allowed_Payment_Request_Button_Types_Update {
 	 * @return WC_Stripe_Payment_Gateway
 	 */
 	public function get_gateway() {
-		return woocommerce_gateway_stripe()->get_main_stripe_gateway();
+		return woocommerce_gateway_stripe_eu()->get_main_stripe_gateway();
 	}
 }

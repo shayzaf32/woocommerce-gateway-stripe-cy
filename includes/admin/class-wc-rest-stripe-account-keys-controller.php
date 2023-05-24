@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class WC_REST_Stripe_Account_Keys_Controller
  */
@@ -13,14 +16,14 @@ defined( 'ABSPATH' ) || exit;
  * @since 5.6.0
  */
 class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Controller {
-	const STRIPE_GATEWAY_SETTINGS_OPTION_NAME = 'woocommerce_stripe_settings';
+	const STRIPE_GATEWAY_SETTINGS_OPTION_NAME = 'woocommerce_stripe_eu_settings';
 
 	/**
 	 * Endpoint path.
 	 *
 	 * @var string
 	 */
-	protected $rest_base = 'wc_stripe/account_keys';
+	protected $rest_base = 'wc_stripe_eu/account_keys';
 
 	/**
 	 * The instance of the Stripe account.
@@ -46,7 +49,7 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_account_keys' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -55,7 +58,7 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::EDITABLE,
+				'methods'             => \WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'set_account_keys' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 				'args'                => [
@@ -97,7 +100,7 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 	/**
 	 * Retrieve flag status.
 	 *
-	 * @return WP_REST_Response
+	 * @return \WP_REST_Response
 	 */
 	public function get_account_keys() {
 		$allowed_params  = [ 'publishable_key', 'secret_key', 'webhook_secret', 'test_publishable_key', 'test_secret_key', 'test_webhook_secret' ];
@@ -105,7 +108,7 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 		// Filter only the fields we want to return
 		$account_keys = array_intersect_key( $stripe_settings, array_flip( $allowed_params ) );
 
-		return new WP_REST_Response( $account_keys );
+		return new \WP_REST_Response( $account_keys );
 	}
 
 	/**
@@ -113,10 +116,10 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 	 * Also validates against explicit key prefixes based on live/test environment.
 	 *
 	 * @param mixed           $value
-	 * @param WP_REST_Request $request
+	 * @param \WP_REST_Request $request
 	 * @param string          $param
 	 * @param array $validate_options
-	 * @return true|WP_Error
+	 * @return true|\WP_Error
 	 */
 	private function validate_stripe_param( $param, $request, $key, $validate_options ) {
 		if ( empty( $param ) ) {
@@ -124,7 +127,7 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 		}
 		$result = rest_validate_request_arg( $param, $request, $key );
 		if ( ! empty( $result ) && ! preg_match( $validate_options['regex'], $param ) ) {
-			return new WP_Error( 400, $validate_options['error_message'] );
+			return new \WP_Error( 400, $validate_options['error_message'] );
 		}
 		return true;
 	}

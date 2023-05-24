@@ -12,21 +12,21 @@ class WC_Stripe_Account_Test extends WP_UnitTestCase {
 	/**
 	 * The Stripe account instance.
 	 *
-	 * @var WC_Stripe_Account
+	 * @var \ElementorStripeEu\WC_Stripe_Account
 	 */
 	private $account;
 
 	public function set_up() {
 		parent::set_up();
 
-		$stripe_settings                         = get_option( 'woocommerce_stripe_settings' );
+		$stripe_settings                         = get_option( 'woocommerce_stripe_eu_settings' );
 		$stripe_settings['enabled']              = 'yes';
 		$stripe_settings['testmode']             = 'yes';
 		$stripe_settings['test_publishable_key'] = 'pk_test_key';
 		$stripe_settings['test_secret_key']      = 'sk_test_key';
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
-		$this->mock_connect = $this->getMockBuilder( 'WC_Stripe_Connect' )
+		$this->mock_connect = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Connect' )
 									->disableOriginalConstructor()
 									->setMethods(
 										[
@@ -35,14 +35,14 @@ class WC_Stripe_Account_Test extends WP_UnitTestCase {
 									)
 									->getMock();
 
-		require_once WC_STRIPE_PLUGIN_PATH . '/includes/class-wc-stripe-account.php';
-		$this->account = new WC_Stripe_Account( $this->mock_connect, 'WC_Helper_Stripe_Api' );
+		require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/class-wc-stripe-account.php';
+		$this->account = new \ElementorStripeEu\WC_Stripe_Account( $this->mock_connect, 'WC_Helper_Stripe_Api' );
 	}
 
 	public function tear_down() {
 		delete_transient( 'wcstripe_account_data_test' );
 		delete_transient( 'wcstripe_account_data_live' );
-		delete_option( 'woocommerce_stripe_settings' );
+		delete_option( 'woocommerce_stripe_eu_settings' );
 
 		parent::tear_down();
 	}

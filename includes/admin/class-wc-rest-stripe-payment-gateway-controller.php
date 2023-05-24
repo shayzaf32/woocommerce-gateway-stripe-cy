@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class WC_REST_Stripe_Payment_Gateway_Controller
  */
@@ -15,12 +18,12 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 	 *
 	 * @var string
 	 */
-	protected $rest_base = 'wc_stripe/payment-gateway';
+	protected $rest_base = 'wc_stripe_eu/payment-gateway';
 
 	/**
 	 * Stripe payment gateway.
 	 *
-	 * @var WC_Gateway_Stripe
+	 * @var WC_Gateway_Stripe_Eu
 	 */
 	private $gateway;
 
@@ -30,21 +33,21 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 	 * @var array
 	 */
 	private $gateways = [
-		'stripe_sepa'       => WC_Gateway_Stripe_Sepa::class,
-		'stripe_giropay'    => WC_Gateway_Stripe_Giropay::class,
-		'stripe_ideal'      => WC_Gateway_Stripe_Ideal::class,
-		'stripe_bancontact' => WC_Gateway_Stripe_Bancontact::class,
-		'stripe_eps'        => WC_Gateway_Stripe_Eps::class,
-		'stripe_sofort'     => WC_Gateway_Stripe_Sofort::class,
-		'stripe_p24'        => WC_Gateway_Stripe_P24::class,
-		'stripe_alipay'     => WC_Gateway_Stripe_Alipay::class,
-		'stripe_multibanco' => WC_Gateway_Stripe_Multibanco::class,
-		'stripe_oxxo'       => WC_Gateway_Stripe_Oxxo::class,
-		'stripe_boleto'     => WC_Gateway_Stripe_Boleto::class,
+		'stripe_sepa'       => \WC_Gateway_Stripe_Sepa::class,
+		'stripe_giropay'    => \WC_Gateway_Stripe_Giropay::class,
+		'stripe_ideal'      => \WC_Gateway_Stripe_Ideal::class,
+		'stripe_bancontact' => \WC_Gateway_Stripe_Bancontact::class,
+		'stripe_eps'        => \WC_Gateway_Stripe_Eps::class,
+		'stripe_sofort'     => \WC_Gateway_Stripe_Sofort::class,
+		'stripe_p24'        => \WC_Gateway_Stripe_P24::class,
+		'stripe_alipay'     => \WC_Gateway_Stripe_Alipay::class,
+		'stripe_multibanco' => \WC_Gateway_Stripe_Multibanco::class,
+		'stripe_oxxo'       => \WC_Gateway_Stripe_Oxxo::class,
+		'stripe_boleto'     => \WC_Gateway_Stripe_Boleto::class,
 	];
 
 	/**
-	 * Returns an instance of some WC_Gateway_Stripe.
+	 * Returns an instance of some WC_Gateway_Stripe_Eu.
 	 *
 	 * @return void
 	 */
@@ -60,7 +63,7 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<payment_gateway_id>[a-z0-9_]+)',
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_payment_gateway_settings' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -69,7 +72,7 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<payment_gateway_id>[a-z0-9_]+)',
 			[
-				'methods'             => WP_REST_Server::EDITABLE,
+				'methods'             => \WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'update_payment_gateway_settings' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -79,8 +82,8 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 	/**
 	 * Retrieve payment gateway settings.
 	 *
-	 * @param WP_REST_Request $request
-	 * @return WP_REST_Response
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
 	 */
 	public function get_payment_gateway_settings( $request = null ) {
 		try {
@@ -94,18 +97,18 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 			if ( method_exists( $this->gateway, 'get_unique_settings' ) ) {
 				$settings = $this->gateway->get_unique_settings( $settings );
 			}
-			return new WP_REST_Response( $settings );
-		} catch ( Exception $exception ) {
-			return new WP_REST_Response( [ 'result' => 'bad_request' ], 400 );
+			return new \WP_REST_Response( $settings );
+		} catch ( \Exception $exception ) {
+			return new \WP_REST_Response( [ 'result' => 'bad_request' ], 400 );
 		}
 	}
 
 	/**
 	 * Update payment gateway settings.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	public function update_payment_gateway_settings( WP_REST_Request $request ) {
+	public function update_payment_gateway_settings( \WP_REST_Request $request ) {
 		try {
 			$id = $request->get_param( 'payment_gateway_id' );
 			$this->instantiate_gateway( $id );
@@ -115,18 +118,18 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 			if ( method_exists( $this->gateway, 'update_unique_settings' ) ) {
 				$this->gateway->update_unique_settings( $request );
 			}
-			return new WP_REST_Response( [], 200 );
-		} catch ( Exception $exception ) {
-			return new WP_REST_Response( [ 'result' => 'bad_request' ], 400 );
+			return new \WP_REST_Response( [], 200 );
+		} catch ( \Exception $exception ) {
+			return new \WP_REST_Response( [ 'result' => 'bad_request' ], 400 );
 		}
 	}
 
 	/**
 	 * Updates payment gateway enabled status.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_gateway_enabled( WP_REST_Request $request ) {
+	private function update_is_gateway_enabled( \WP_REST_Request $request ) {
 		$field_name = 'is_' . $this->gateway->id . '_enabled';
 		$is_enabled = $request->get_param( $field_name );
 
@@ -144,9 +147,9 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 	/**
 	 * Updates payment gateway title.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_gateway_name( WP_REST_Request $request ) {
+	private function update_gateway_name( \WP_REST_Request $request ) {
 		$field_name = $this->gateway->id . '_name';
 		$name       = $request->get_param( $field_name );
 
@@ -161,9 +164,9 @@ class WC_REST_Stripe_Payment_Gateway_Controller extends WC_Stripe_REST_Base_Cont
 	/**
 	 * Updates payment gateway description.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_gateway_description( WP_REST_Request $request ) {
+	private function update_gateway_description( \WP_REST_Request $request ) {
 		$field_name  = $this->gateway->id . '_description';
 		$description = $request->get_param( $field_name );
 

@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -6,11 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * WC_Gateway_Stripe class.
  *
- * @extends WC_Payment_Gateway
+ * @extends WC_Stripe_Payment_Gateway
  */
-class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
+class WC_Gateway_Stripe_Eu extends WC_Stripe_Payment_Gateway {
 
-	const ID = 'stripe';
+	const ID = 'stripe_eu';
 
 	/**
 	 * Should we capture Credit cards
@@ -72,8 +75,8 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->id           = self::ID;
-		$this->method_title = __( 'Stripe', 'woocommerce-gateway-stripe' );
+		$this->id           = static::ID; // TODO consider to add method of get_id() instead
+		$this->method_title = __( 'Stripe EU', 'woocommerce-gateway-stripe' ); // TODO consider to add method of get_name() instead
 		/* translators: 1) link to Stripe register page 2) link to Stripe api keys page */
 		$this->method_description = __( 'Stripe works by adding payment fields on the checkout and then sending the details to Stripe for verification.', 'woocommerce-gateway-stripe' );
 		$this->has_fields         = true;
@@ -139,7 +142,8 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 			return false;
 		}
 
-		return parent::is_available();
+		$is_available = parent::is_available();
+		return $is_available;
 	}
 
 	/**
@@ -211,7 +215,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 		ob_start();
 
 		echo '<div
-			id="stripe-payment-data"
+			id="stripe-eu-payment-data"
 			data-email="' . esc_attr( $user_email ) . '"
 			data-full-name="' . esc_attr( $firstname . ' ' . $lastname ) . '"
 			data-currency="' . esc_attr( strtolower( get_woocommerce_currency() ) ) . '"
@@ -261,14 +265,14 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 					<?php esc_html_e( 'Credit or debit card', 'woocommerce-gateway-stripe' ); ?>
 				</label>
 
-				<div id="stripe-card-element" class="wc-stripe-elements-field">
+				<div id="stripe-eu-card-element" class="wc-stripe-elements-field">
 				<!-- a Stripe Element will be inserted here. -->
 				</div>
 			<?php } else { ?>
 				<div class="form-row form-row-wide">
-					<label for="stripe-card-element"><?php esc_html_e( 'Card Number', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
+					<label for="stripe-eu-card-element"><?php esc_html_e( 'Card Number', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
 					<div class="stripe-card-group">
-						<div id="stripe-card-element" class="wc-stripe-elements-field">
+						<div id="stripe-eu-card-element" class="wc-stripe-elements-field">
 						<!-- a Stripe Element will be inserted here. -->
 						</div>
 
@@ -277,16 +281,16 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 				</div>
 
 				<div class="form-row form-row-first">
-					<label for="stripe-exp-element"><?php esc_html_e( 'Expiry Date', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
+					<label for="stripe-eu-exp-element"><?php esc_html_e( 'Expiry Date', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
 
-					<div id="stripe-exp-element" class="wc-stripe-elements-field">
+					<div id="stripe-eu-exp-element" class="wc-stripe-elements-field">
 					<!-- a Stripe Element will be inserted here. -->
 					</div>
 				</div>
 
 				<div class="form-row form-row-last">
-					<label for="stripe-cvc-element"><?php esc_html_e( 'Card Code (CVC)', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
-				<div id="stripe-cvc-element" class="wc-stripe-elements-field">
+					<label for="stripe-eu-cvc-element"><?php esc_html_e( 'Card Code (CVC)', 'woocommerce-gateway-stripe' ); ?> <span class="required">*</span></label>
+				<div id="stripe-eu-cvc-element" class="wc-stripe-elements-field">
 				<!-- a Stripe Element will be inserted here. -->
 				</div>
 				</div>
@@ -305,15 +309,15 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * Override the parent admin_options method.
 	 */
 	public function admin_options() {
-		do_action( 'wc_stripe_gateway_admin_options_wrapper', $this );
+		do_action( 'wc_stripe_eu_gateway_admin_options_wrapper', $this );
 	}
 
 	/**
 	 * Completes an order without a positive value.
 	 *
 	 * @since 4.2.0
-	 * @param WC_Order $order             The order to complete.
-	 * @param WC_Order $prepared_source   Payment source and customer data.
+	 * @param \WC_Order $order             The order to complete.
+	 * @param \WC_Order $prepared_source   Payment source and customer data.
 	 * @param boolean  $force_save_source Whether the payment source must be saved, like when dealing with a Subscription setup.
 	 * @return array                      Redirection data for `process_payment`.
 	 */
@@ -356,7 +360,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * @param mix  $previous_error Any error message from previous request.
 	 * @param bool $use_order_source Whether to use the source, which should already be attached to the order.
 	 *
-	 * @throws Exception If payment will not be accepted.
+	 * @throws \Exception If payment will not be accepted.
 	 * @return array|void
 	 */
 	public function process_payment( $order_id, $retry = true, $force_save_source = false, $previous_error = false, $use_order_source = false ) {
@@ -509,7 +513,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 */
 	public function save_payment_method( $source_object ) {
 		$user_id  = get_current_user_id();
-		$customer = new WC_Stripe_Customer( $user_id );
+		$customer = new \ElementorStripeEu\WC_Stripe_Customer( $user_id );
 
 		if ( ( $user_id && WC_Stripe_Helper::is_reusable_payment_method( $source_object ) ) ) {
 			$response = $customer->add_source( $source_object->id );
@@ -602,7 +606,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 *
 	 * @since 4.2.0
 	 * @param object   $response          The response from the Stripe API.
-	 * @param WC_Order $order             An order that is being paid for.
+	 * @param \WC_Order $order             An order that is being paid for.
 	 * @param bool     $retry             A flag that indicates whether another retry should be attempted.
 	 * @param bool     $force_save_source Force save the payment source.
 	 * @param mixed    $previous_error    Any error message from previous request.
@@ -633,8 +637,8 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * it up and prepare it for the Stripe PaymentIntents modal to confirm a payment.
 	 *
 	 * @since 4.2
-	 * @param WC_Payment_Gateway[] $gateways A list of all available gateways.
-	 * @return WC_Payment_Gateway[]          Either the same list or an empty one in the right conditions.
+	 * @param \WC_Payment_Gateway[] $gateways A list of all available gateways.
+	 * @return \WC_Payment_Gateway[]          Either the same list or an empty one in the right conditions.
 	 */
 	public function prepare_order_pay_page( $gateways ) {
 		if ( ! is_wc_endpoint_url( 'order-pay' ) || ! isset( $_GET['wc-stripe-confirmation'] ) ) { // wpcs: csrf ok.
@@ -671,7 +675,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	/**
 	 * Prepares the Payment Intent for it to be completed in the "Pay for Order" page.
 	 *
-	 * @param WC_Order|null $order Order object, or null to get the order from the "order-pay" URL parameter
+	 * @param \WC_Order|null $order Order object, or null to get the order from the "order-pay" URL parameter
 	 *
 	 * @throws WC_Stripe_Exception
 	 * @since 4.3
@@ -716,7 +720,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	/**
 	 * Renders hidden inputs on the "Pay for Order" page in order to let Stripe handle PaymentIntents.
 	 *
-	 * @param WC_Order|null $order Order object, or null to get the order from the "order-pay" URL parameter
+	 * @param \WC_Order|null $order Order object, or null to get the order from the "order-pay" URL parameter
 	 *
 	 * @throws WC_Stripe_Exception
 	 * @since 4.2
@@ -736,7 +740,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 				'redirect_to'      => rawurlencode( $this->get_return_url( $order ) ),
 				'is_pay_for_order' => true,
 			],
-			WC_AJAX::get_endpoint( 'wc_stripe_verify_intent' )
+			\WC_AJAX::get_endpoint( 'wc_stripe_verify_intent' )
 		);
 
 		echo '<input type="hidden" id="stripe-intent-id" value="' . esc_attr( $this->order_pay_intent->client_secret ) . '" />';
@@ -747,7 +751,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * Adds an error message wrapper to each saved method.
 	 *
 	 * @since 4.2.0
-	 * @param WC_Payment_Token $token Payment Token.
+	 * @param \WC_Payment_Token $token Payment Token.
 	 * @return string                 Generated payment method HTML
 	 */
 	public function get_saved_payment_method_option_html( $token ) {
@@ -808,7 +812,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 			$query_params['save_payment_method'] = true;
 		}
 
-		$verification_url = add_query_arg( $query_params, WC_AJAX::get_endpoint( 'wc_stripe_verify_intent' ) );
+		$verification_url = add_query_arg( $query_params, \WC_AJAX::get_endpoint( 'wc_stripe_verify_intent' ) );
 
 		if ( isset( $result['payment_intent_secret'] ) ) {
 			$redirect = sprintf( '#confirm-pi-%s:%s', $result['payment_intent_secret'], rawurlencode( $verification_url ) );
@@ -834,7 +838,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * method updates orders based on the status of associated PaymentIntents.
 	 *
 	 * @since 4.2.0
-	 * @param WC_Order $order The order which is in a transitional state.
+	 * @param \WC_Order $order The order which is in a transitional state.
 	 */
 	public function verify_intent_after_checkout( $order ) {
 		$payment_method = $order->get_payment_method();
@@ -890,8 +894,8 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * Called after an intent verification succeeds, this allows
 	 * specific APNs or children of this class to modify its behavior.
 	 *
-	 * @param WC_Order $order The order whose verification succeeded.
-	 * @param stdClass $intent The Payment Intent object.
+	 * @param \WC_Order $order The order whose verification succeeded.
+	 * @param \stdClass $intent The Payment Intent object.
 	 */
 	protected function handle_intent_verification_success( $order, $intent ) {
 		$this->process_response( end( $intent->charges->data ), $order );
@@ -902,8 +906,8 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * Called after an intent verification fails, this allows
 	 * specific APNs or children of this class to modify its behavior.
 	 *
-	 * @param WC_Order $order The order whose verification failed.
-	 * @param stdClass $intent The Payment Intent object.
+	 * @param \WC_Order $order The order whose verification failed.
+	 * @param \stdClass $intent The Payment Intent object.
 	 */
 	protected function handle_intent_verification_failure( $order, $intent ) {
 		$this->failed_sca_auth( $order, $intent );
@@ -914,7 +918,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * Checks if the payment intent associated with an order failed and records the event.
 	 *
 	 * @since 4.2.0
-	 * @param WC_Order $order  The order which should be checked.
+	 * @param \WC_Order $order  The order which should be checked.
 	 * @param object   $intent The intent, associated with the order.
 	 */
 	public function failed_sca_auth( $order, $intent ) {
@@ -935,7 +939,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * Preserves the "wc-stripe-confirmation" URL parameter so the user can complete the SCA authentication after logging in.
 	 *
 	 * @param string   $pay_url Current computed checkout URL for the given order.
-	 * @param WC_Order $order Order object.
+	 * @param \WC_Order $order Order object.
 	 *
 	 * @return string Checkout URL for the given order.
 	 */
@@ -1078,7 +1082,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 	 * @param int    $max_length Maximum statement length.
 	 *
 	 * @return string                   Sanitized statement descriptor.
-	 * @throws InvalidArgumentException When statement descriptor is invalid.
+	 * @throws \InvalidArgumentException When statement descriptor is invalid.
 	 */
 	public function validate_account_statement_descriptor_field( $param, $value, $max_length ) {
 		// Since the value is escaped, and we are saving in a place that does not require escaping, apply stripslashes.
@@ -1099,7 +1103,7 @@ class WC_Gateway_Stripe extends WC_Stripe_Payment_Gateway {
 			! preg_match( $has_one_letter, $value ) ||
 			! preg_match( $no_specials, $value )
 		) {
-			throw new InvalidArgumentException(
+			throw new \InvalidArgumentException(
 				sprintf(
 					/* translators: %1 field name, %2 Number of the maximum characters allowed */
 					__( 'The %1$s is invalid. The bank statement must contain only Latin characters, be between 5 and %2$u characters, contain at least one letter, and not contain any of the special characters: \' " * &lt; &gt;', 'woocommerce-gateway-stripe' ),

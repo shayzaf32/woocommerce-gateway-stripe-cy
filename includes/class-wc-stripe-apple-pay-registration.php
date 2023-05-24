@@ -5,9 +5,13 @@
  * @since 4.0.6
  */
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use \ElementorStripeEu\WC_Stripe_Logger;
 
 class WC_Stripe_Apple_Pay_Registration {
 
@@ -53,7 +57,7 @@ class WC_Stripe_Apple_Pay_Registration {
 		add_action( 'add_option_woocommerce_stripe_settings', [ $this, 'verify_domain_on_new_settings' ], 10, 2 );
 		add_action( 'update_option_woocommerce_stripe_settings', [ $this, 'verify_domain_on_updated_settings' ], 10, 2 );
 
-		$this->stripe_settings         = get_option( 'woocommerce_stripe_settings', [] );
+		$this->stripe_settings         = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$this->domain_name             = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : str_replace( array( 'https://', 'http://' ), '', get_site_url() ); // @codingStandardsIgnoreLine
 		$this->apple_pay_domain_set    = 'yes' === $this->get_option( 'apple_pay_domain_set', 'no' );
 		$this->apple_pay_verify_notice = '';
@@ -123,7 +127,7 @@ class WC_Stripe_Apple_Pay_Registration {
 	 */
 	private function verify_hosted_domain_association_file_is_up_to_date() {
 		// Contents of domain association file from plugin dir.
-		$new_contents = @file_get_contents( WC_STRIPE_PLUGIN_PATH . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME ); // @codingStandardsIgnoreLine
+		$new_contents = @file_get_contents( WC_STRIPE_EU_PLUGIN_PATH . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME ); // @codingStandardsIgnoreLine
 		// Get file contents from local path and remote URL and check if either of which matches.
 		$fullpath        = untrailingslashit( ABSPATH ) . '/' . self::DOMAIN_ASSOCIATION_FILE_DIR . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME;
 		$local_contents  = @file_get_contents( $fullpath ); // @codingStandardsIgnoreLine
@@ -150,7 +154,7 @@ class WC_Stripe_Apple_Pay_Registration {
 			}
 		}
 
-		if ( ! @copy( WC_STRIPE_PLUGIN_PATH . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME, $fullpath ) ) { // @codingStandardsIgnoreLine
+		if ( ! @copy( WC_STRIPE_EU_PLUGIN_PATH . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME, $fullpath ) ) { // @codingStandardsIgnoreLine
 			return __( 'Unable to copy domain association file to domain root.', 'woocommerce-gateway-stripe' );
 		}
 	}
@@ -214,7 +218,7 @@ class WC_Stripe_Apple_Pay_Registration {
 			return;
 		}
 
-		$path = WC_STRIPE_PLUGIN_PATH . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME;
+		$path = WC_STRIPE_EU_PLUGIN_PATH . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME;
 		header( 'Content-Type: text/plain;charset=utf-8' );
 		echo esc_html( file_get_contents( $path ) );
 		exit;
@@ -286,7 +290,7 @@ class WC_Stripe_Apple_Pay_Registration {
 			$this->stripe_settings['apple_pay_domain_set']      = 'yes';
 			$this->apple_pay_domain_set                         = true;
 
-			update_option( 'woocommerce_stripe_settings', $this->stripe_settings );
+			update_option( 'woocommerce_stripe_eu_settings', $this->stripe_settings );
 
 			WC_Stripe_Logger::log( 'Your domain has been verified with Apple Pay!' );
 
@@ -297,7 +301,7 @@ class WC_Stripe_Apple_Pay_Registration {
 			$this->stripe_settings['apple_pay_domain_set']      = 'no';
 			$this->apple_pay_domain_set                         = false;
 
-			update_option( 'woocommerce_stripe_settings', $this->stripe_settings );
+			update_option( 'woocommerce_stripe_eu_settings', $this->stripe_settings );
 
 			WC_Stripe_Logger::log( 'Error: ' . $e->getMessage() );
 
@@ -329,7 +333,7 @@ class WC_Stripe_Apple_Pay_Registration {
 		$verification_complete = $this->register_domain_with_apple( $secret_key );
 
 		// Show/hide notes if necessary.
-		WC_Stripe_Inbox_Notes::notify_on_apple_pay_domain_verification( $verification_complete );
+		\ElementorStripeEu\WC_Stripe_Inbox_Notes::notify_on_apple_pay_domain_verification( $verification_complete );
 	}
 
 	/**

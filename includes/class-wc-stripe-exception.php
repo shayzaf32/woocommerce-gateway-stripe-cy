@@ -7,11 +7,13 @@
  * @since 4.0.2
  */
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WC_Stripe_Exception extends Exception {
+class WC_Stripe_Exception extends \Exception {
 
 	/**
 	 * String sanitized/localized error message.

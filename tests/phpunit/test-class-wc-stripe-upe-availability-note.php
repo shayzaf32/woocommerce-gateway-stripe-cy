@@ -1,4 +1,7 @@
 <?php
+
+use \ElementorStripeEu\WC_Stripe_UPE_Availability_Note;
+
 /**
  * Class WC_Stripe_UPE_Availability_Note_Test
  *
@@ -11,7 +14,7 @@
 class WC_Stripe_UPE_Availability_Note_Test extends WP_UnitTestCase {
 	public function test_get_note() {
 		if ( version_compare( WC_VERSION, '4.4.0', '>=' ) ) {
-			require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
+			require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
 			$note = WC_Stripe_UPE_Availability_Note::get_note();
 
 			$this->assertSame( 'Boost your sales with the new payment experience in Stripe', $note->get_title() );

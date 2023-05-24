@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Admin email about payment retry failed due to authentication
  *
@@ -6,8 +9,8 @@
  * with the `authentication_needed` error, and a retry rule has been applied to retry the payment in the future.
  *
  * @version     4.3.0
- * @package     WooCommerce_Stripe/Classes/WC_Stripe_Email_Failed_Authentication_Retry
- * @extends     WC_Email_Failed_Order
+ * @package     WooCommerce_Stripe/Classes/WC_Stripe_Email_Failed_Authentication
+ * @extends     \WC_Email_Failed_Order
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.3.0
  */
-class WC_Stripe_Email_Failed_Authentication_Retry extends WC_Email_Failed_Order {
+class WC_Stripe_Email_Failed_Authentication_Retry extends \WC_Email_Failed_Order {
 
 	/**
 	 * Constructor
@@ -34,12 +37,12 @@ class WC_Stripe_Email_Failed_Authentication_Retry extends WC_Email_Failed_Order 
 
 		$this->template_html  = 'emails/failed-renewal-authentication-requested.php';
 		$this->template_plain = 'emails/plain/failed-renewal-authentication-requested.php';
-		$this->template_base  = plugin_dir_path( WC_STRIPE_MAIN_FILE ) . 'templates/';
+		$this->template_base  = plugin_dir_path( WC_STRIPE_EU_MAIN_FILE ) . 'templates/';
 
 		$this->recipient = $this->get_option( 'recipient', get_option( 'admin_email' ) );
 
 		// We want all the parent's methods, with none of its properties, so call its parent's constructor, rather than my parent constructor.
-		WC_Email::__construct();
+		\WC_Email::__construct();
 	}
 
 	/**
@@ -64,7 +67,7 @@ class WC_Stripe_Email_Failed_Authentication_Retry extends WC_Email_Failed_Order 
 	 * Trigger.
 	 *
 	 * @param int           $order_id The order ID.
-	 * @param WC_Order|null $order Order object.
+	 * @param \WC_Order|null $order Order object.
 	 */
 	public function trigger( $order_id, $order = null ) {
 		$this->object = $order;

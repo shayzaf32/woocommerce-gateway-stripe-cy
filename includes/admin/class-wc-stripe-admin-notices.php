@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -63,7 +66,7 @@ class WC_Stripe_Admin_Notices {
 
 			if ( $notice['dismissible'] ) {
 				?>
-				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-stripe-hide-notice', $notice_key ), 'wc_stripe_hide_notices_nonce', '_wc_stripe_notice_nonce' ) ); ?>" class="woocommerce-message-close notice-dismiss" style="position:relative;float:right;padding:9px 0px 9px 9px 9px;text-decoration:none;"></a>
+				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-stripe-hide-notice', $notice_key ), 'wc_stripe_hide_notices_nonce', '_wc_stripe_notice_nonce' ) ); ?>" class="woocommerce-message-close notice-dismiss" style="position:relative;float:right;padding:9px 0px 9px 9px;text-decoration:none;"></a>
 				<?php
 			}
 
@@ -120,7 +123,7 @@ class WC_Stripe_Admin_Notices {
 		$show_curl_notice    = get_option( 'wc_stripe_show_curl_notice' );
 		$show_sca_notice     = get_option( 'wc_stripe_show_sca_notice' );
 		$changed_keys_notice = get_option( 'wc_stripe_show_changed_keys_notice' );
-		$options             = get_option( 'woocommerce_stripe_settings' );
+		$options             = get_option( 'woocommerce_stripe_eu_settings' );
 		$testmode            = ( isset( $options['testmode'] ) && 'yes' === $options['testmode'] ) ? true : false;
 		$test_pub_key        = isset( $options['test_publishable_key'] ) ? $options['test_publishable_key'] : '';
 		$test_secret_key     = isset( $options['test_secret_key'] ) ? $options['test_secret_key'] : '';
@@ -157,21 +160,21 @@ class WC_Stripe_Admin_Notices {
 
 			// @codeCoverageIgnoreStart
 			if ( empty( $show_phpver_notice ) ) {
-				if ( version_compare( phpversion(), WC_STRIPE_MIN_PHP_VER, '<' ) ) {
+				if ( version_compare( phpversion(), WC_STRIPE_EU_MIN_PHP_VER, '<' ) ) {
 					/* translators: 1) int version 2) int version */
 					$message = __( 'WooCommerce Stripe - The minimum PHP version required for this plugin is %1$s. You are running %2$s.', 'woocommerce-gateway-stripe' );
 
-					$this->add_admin_notice( 'phpver', 'error', sprintf( $message, WC_STRIPE_MIN_PHP_VER, phpversion() ), true );
+					$this->add_admin_notice( 'phpver', 'error', sprintf( $message, WC_STRIPE_EU_MIN_PHP_VER, phpversion() ), true );
 
 					return;
 				}
 			}
 
 			if ( empty( $show_wcver_notice ) ) {
-				if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_FUTURE_MIN_WC_VER ) ) {
+				if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_EU_FUTURE_MIN_WC_VER ) ) {
 					/* translators: 1) int version 2) int version */
 					$message = __( 'WooCommerce Stripe - This is the last version of the plugin compatible with WooCommerce %1$s. All future versions of the plugin will require WooCommerce %2$s or greater.', 'woocommerce-gateway-stripe' );
-					$this->add_admin_notice( 'wcver', 'notice notice-warning', sprintf( $message, WC_VERSION, WC_STRIPE_FUTURE_MIN_WC_VER ), true );
+					$this->add_admin_notice( 'wcver', 'notice notice-warning', sprintf( $message, WC_VERSION, WC_STRIPE_EU_FUTURE_MIN_WC_VER ), true );
 				}
 			}
 
@@ -185,7 +188,7 @@ class WC_Stripe_Admin_Notices {
 			if ( empty( $show_keys_notice ) ) {
 				$secret = WC_Stripe_API::get_secret_key();
 				// phpcs:ignore
-				$should_show_notice_on_page = ! ( isset( $_GET['page'], $_GET['section'] ) && 'wc-settings' === $_GET['page'] && 0 === strpos( $_GET['section'], 'stripe' ) );
+				$should_show_notice_on_page = ! ( isset( $_GET['page'], $_GET['section'] ) && 'wc-settings' === $_GET['page'] && 0 === strpos( $_GET['section'], 'stripe_eu' ) );
 
 				if ( empty( $secret ) && $should_show_notice_on_page ) {
 					$setting_link = $this->get_setting_link();
@@ -428,7 +431,7 @@ class WC_Stripe_Admin_Notices {
 	 * @since 4.3.0
 	 */
 	public function stripe_updated() {
-		$previous_version = get_option( 'wc_stripe_version' );
+		$previous_version = get_option( 'wc_stripe_eu_version' );
 
 		// Only show the style notice if the plugin was installed and older than 4.1.4.
 		if ( empty( $previous_version ) || version_compare( $previous_version, '4.1.4', 'ge' ) ) {

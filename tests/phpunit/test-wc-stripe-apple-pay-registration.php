@@ -1,4 +1,7 @@
 <?php
+
+use \ElementorStripeEu\WC_Stripe_Apple_Pay_Registration;
+
 /**
  * These teste make assertions against class WC_Stripe_Apple_Pay_Registration.
  *
@@ -40,7 +43,7 @@ class WC_Stripe_Apple_Pay_Registration_Test extends WP_UnitTestCase {
 		$this->wc_apple_pay_registration = new WC_Stripe_Apple_Pay_Registration();
 
 		$this->file_name             = 'apple-developer-merchantid-domain-association';
-		$this->initial_file_contents = file_get_contents( WC_STRIPE_PLUGIN_PATH . '/' . $this->file_name ); // @codingStandardsIgnoreLine
+		$this->initial_file_contents = file_get_contents( WC_STRIPE_EU_PLUGIN_PATH . '/' . $this->file_name ); // @codingStandardsIgnoreLine
 	}
 
 	public function tear_down() {

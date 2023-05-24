@@ -3,10 +3,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \ElementorStripeEu\WC_Stripe_Exception;
+use \ElementorStripeEu\WC_Gateway_Stripe_Eu;
+
 /**
  * Class that handles OXXO payment method.
  *
- * @extends WC_Gateway_Stripe
+ * @extends WC_Gateway_Stripe_Eu
  *
  * @since 5.8.0
  */

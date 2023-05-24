@@ -38,7 +38,7 @@ class WC_Stripe_Intent_Controller_Test extends WP_UnitTestCase {
 			->disableOriginalConstructor()
 			->setMethods( [ 'maybe_process_upe_redirect' ] )
 			->getMock();
-		$this->mock_controller = $this->getMockBuilder( 'WC_Stripe_Intent_Controller' )
+		$this->mock_controller = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Intent_Controller' )
 			->disableOriginalConstructor()
 			->setMethods( [ 'get_gateway' ] )
 			->getMock();

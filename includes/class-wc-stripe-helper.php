@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -332,7 +335,7 @@ class WC_Stripe_Helper {
 	 * @param string $setting The name of the setting to get.
 	 */
 	public static function get_settings( $method = null, $setting = null ) {
-		$all_settings = null === $method ? get_option( 'woocommerce_stripe_settings', [] ) : get_option( 'woocommerce_stripe_' . $method . '_settings', [] );
+		$all_settings = null === $method ? get_option( 'woocommerce_stripe_eu_settings', [] ) : get_option( 'woocommerce_stripe_' . $method . '_settings', [] );
 
 		if ( null === $setting ) {
 			return $all_settings;
@@ -776,10 +779,10 @@ class WC_Stripe_Helper {
 	/**
 	 * Evaluates whether the object passed to this function is a Stripe Payment Method.
 	 *
-	 * @param stdClass $object  The object that should be evaluated.
+	 * @param \stdClass $object  The object that should be evaluated.
 	 * @return bool             Returns true if the object is a Payment Method; false otherwise.
 	 */
-	public static function is_payment_method_object( stdClass $payment_method ): bool {
+	public static function is_payment_method_object( \stdClass $payment_method ): bool {
 		return isset( $payment_method->object ) && 'payment_method' === $payment_method->object;
 	}
 
@@ -788,22 +791,22 @@ class WC_Stripe_Helper {
 	 * Payment Methods are always reusable; Sources are only reusable when the appropriate
 	 * usage metadata is provided.
 	 *
-	 * @param stdClass $payment_method  The source or payment method to be evaluated.
+	 * @param \stdClass $payment_method  The source or payment method to be evaluated.
 
 	 * @return bool  Returns true if the source is reusable; false otherwise.
 	 */
-	public static function is_reusable_payment_method( stdClass $payment_method ): bool {
+	public static function is_reusable_payment_method( \stdClass $payment_method ): bool {
 		return self::is_payment_method_object( $payment_method ) || ( isset( $payment_method->usage ) && 'reusable' === $payment_method->usage );
 	}
 
 	/**
 	 * Returns true if the provided payment method is a card, false otherwise.
 	 *
-	 * @param stdClass $payment_method  The provided payment method object. Can be a Source or a Payment Method.
+	 * @param \stdClass $payment_method  The provided payment method object. Can be a Source or a Payment Method.
 	 *
 	 * @return bool  True if payment method is a card, false otherwise.
 	 */
-	public static function is_card_payment_method( stdClass $payment_method ): bool {
+	public static function is_card_payment_method( \stdClass $payment_method ): bool {
 		if ( ! isset( $payment_method->object ) || ! isset( $payment_method->type ) ) {
 			return false;
 		}
@@ -818,9 +821,9 @@ class WC_Stripe_Helper {
 	/**
 	 * Returns a source or payment method from a given intent object.
 	 *
-	 * @param stdClass|object $intent  The intent that contains the payment method.
+	 * @param \stdClass|object $intent  The intent that contains the payment method.
 	 *
-	 * @return stdClass|string|null  The payment method if found, null otherwise.
+	 * @return \stdClass|string|null  The payment method if found, null otherwise.
 	 */
 	public static function get_payment_method_from_intent( $intent ) {
 		if ( ! empty( $intent->source ) ) {

@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Stripe Payment Request API
  * Adds support for Apple Pay and Chrome Payment Request API buttons.
@@ -69,7 +72,7 @@ class WC_Stripe_Payment_Request {
 	 */
 	public function __construct() {
 		self::$_this           = $this;
-		$this->stripe_settings = get_option( 'woocommerce_stripe_settings', [] );
+		$this->stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$this->testmode        = ( ! empty( $this->stripe_settings['testmode'] ) && 'yes' === $this->stripe_settings['testmode'] ) ? true : false;
 		$this->publishable_key = ! empty( $this->stripe_settings['publishable_key'] ) ? $this->stripe_settings['publishable_key'] : '';
 		$this->secret_key      = ! empty( $this->stripe_settings['secret_key'] ) ? $this->stripe_settings['secret_key'] : '';
@@ -225,8 +228,7 @@ class WC_Stripe_Payment_Request {
 
 		add_action( 'woocommerce_checkout_before_customer_details', [ $this, 'display_payment_request_button_html' ], 1 );
 		add_action( 'woocommerce_checkout_before_customer_details', [ $this, 'display_payment_request_button_separator_html' ], 2 );
-
-		add_action( 'wc_ajax_wc_stripe_get_cart_details', [ $this, 'ajax_get_cart_details' ] );
+		add_action( 'wc_ajax_wc_stripe_get_cart_details_eu', [ $this, 'ajax_get_cart_details' ], 9 );
 		add_action( 'wc_ajax_wc_stripe_get_shipping_options', [ $this, 'ajax_get_shipping_options' ] );
 		add_action( 'wc_ajax_wc_stripe_update_shipping_method', [ $this, 'ajax_update_shipping_method' ] );
 		add_action( 'wc_ajax_wc_stripe_create_order', [ $this, 'ajax_create_order' ] );
@@ -364,8 +366,8 @@ class WC_Stripe_Payment_Request {
 	public function get_product_price( $product ) {
 		$product_price = $product->get_price();
 		// Add subscription sign-up fees to product price.
-		if ( 'subscription' === $product->get_type() && class_exists( 'WC_Subscriptions_Product' ) ) {
-			$product_price = $product->get_price() + WC_Subscriptions_Product::get_sign_up_fee( $product );
+		if ( 'subscription' === $product->get_type() && class_exists( '\WC_Subscriptions_Product' ) ) {
+			$product_price = $product->get_price() + \WC_Subscriptions_Product::get_sign_up_fee( $product );
 		}
 
 		return $product_price;
@@ -398,7 +400,7 @@ class WC_Stripe_Payment_Request {
 					: $product->get_variation_default_attribute( $attribute_name );
 			}
 
-			$data_store   = WC_Data_Store::load( 'product' );
+			$data_store   = \WC_Data_Store::load( 'product' );
 			$variation_id = $data_store->find_matching_product_variation( $product, $attributes );
 
 			if ( ! empty( $variation_id ) ) {
@@ -463,7 +465,7 @@ class WC_Stripe_Payment_Request {
 		$order        = wc_get_order( $post->ID );
 		$method_title = is_object( $order ) ? $order->get_payment_method_title() : '';
 
-		if ( 'stripe' === $id && ! empty( $method_title ) ) {
+		if ( 'stripe_eu' === $id && ! empty( $method_title ) ) {
 			if ( 'Apple Pay (Stripe)' === $method_title
 				|| 'Google Pay (Stripe)' === $method_title
 				|| 'Payment Request (Stripe)' === $method_title
@@ -522,7 +524,7 @@ class WC_Stripe_Payment_Request {
 	 * @return  void
 	 */
 	public function add_order_meta( $order_id, $posted_data ) {
-		if ( empty( $_POST['payment_request_type'] ) || ! isset( $_POST['payment_method'] ) || 'stripe' !== $_POST['payment_method'] ) {
+		if ( empty( $_POST['payment_request_type'] ) || ! isset( $_POST['payment_method'] ) || 'stripe_eu' !== $_POST['payment_method'] ) {
 			return;
 		}
 
@@ -593,7 +595,7 @@ class WC_Stripe_Payment_Request {
 			}
 
 			// Trial subscriptions with shipping are not supported.
-			if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $_product ) && $_product->needs_shipping() && WC_Subscriptions_Product::get_trial_length( $_product ) > 0 ) {
+			if ( class_exists( '\WC_Subscriptions_Product' ) && \WC_Subscriptions_Product::is_subscription( $_product ) && $_product->needs_shipping() && \WC_Subscriptions_Product::get_trial_length( $_product ) > 0 ) {
 				return false;
 			}
 		}
@@ -616,19 +618,19 @@ class WC_Stripe_Payment_Request {
 	 * @return boolean
 	 */
 	public function has_subscription_product() {
-		if ( ! class_exists( 'WC_Subscriptions_Product' ) ) {
+		if ( ! class_exists( '\WC_Subscriptions_Product' ) ) {
 			return false;
 		}
 
 		if ( $this->is_product() ) {
 			$product = $this->get_product();
-			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
+			if ( \WC_Subscriptions_Product::is_subscription( $product ) ) {
 				return true;
 			}
 		} elseif ( WC_Stripe_Helper::has_cart_or_checkout_on_current_page() ) {
 			foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 				$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
-				if ( WC_Subscriptions_Product::is_subscription( $_product ) ) {
+				if ( \WC_Subscriptions_Product::is_subscription( $_product ) ) {
 					return true;
 				}
 			}
@@ -651,7 +653,7 @@ class WC_Stripe_Payment_Request {
 	 * Get product from product page or product_page shortcode.
 	 *
 	 * @since 5.2.0
-	 * @return WC_Product Product object.
+	 * @return \WC_Product Product object.
 	 */
 	public function get_product() {
 		global $post;
@@ -703,8 +705,8 @@ class WC_Stripe_Payment_Request {
 		}
 
 		return [
-			'ajax_url'           => WC_AJAX::get_endpoint( '%%endpoint%%' ),
-			'stripe'             => [
+			'ajax_url'           => \WC_AJAX::get_endpoint( '%%endpoint%%' ),
+			'stripe_eu'             => [
 				'key'                => $this->publishable_key,
 				'allow_prepaid_card' => apply_filters( 'wc_stripe_allow_prepaid_card', true ) ? 'yes' : 'no',
 				'locale'             => WC_Stripe_Helper::convert_wc_locale_to_stripe_locale( get_locale() ),
@@ -760,19 +762,19 @@ class WC_Stripe_Payment_Request {
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-		wp_register_script( 'stripe', 'https://js.stripe.com/v3/', '', '3.0', true );
-		wp_register_script( 'wc_stripe_payment_request', plugins_url( 'assets/js/stripe-payment-request' . $suffix . '.js', WC_STRIPE_MAIN_FILE ), [ 'jquery', 'stripe' ], WC_STRIPE_VERSION, true );
+		wp_register_script( 'stripe_eu', 'https://js.stripe.com/v3/', '', '3.0', true );
+		wp_register_script( 'wc_stripe_eu_payment_request', plugins_url( 'assets/js/stripe-payment-request' . $suffix . '.js', WC_STRIPE_EU_MAIN_FILE ), [ 'jquery', 'stripe_eu' ], WC_STRIPE_EU_VERSION, true );
 
 		wp_localize_script(
-			'wc_stripe_payment_request',
-			'wc_stripe_payment_request_params',
+			'wc_stripe_eu_payment_request',
+			'wc_stripe_eu_payment_request_params',
 			apply_filters(
-				'wc_stripe_payment_request_params',
+				'wc_stripe_eu_payment_request_params',
 				$this->javascript_params()
 			)
 		);
 
-		wp_enqueue_script( 'wc_stripe_payment_request' );
+		wp_enqueue_script( 'wc_stripe_eu_payment_request' );
 	}
 
 	/**
@@ -797,7 +799,7 @@ class WC_Stripe_Payment_Request {
 	public function display_payment_request_button_html() {
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
 
-		if ( ! isset( $gateways['stripe'] ) ) {
+		if ( ! isset( $gateways['stripe_eu'] ) ) {
 			return;
 		}
 
@@ -835,7 +837,7 @@ class WC_Stripe_Payment_Request {
 	public function display_payment_request_button_separator_html() {
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
 
-		if ( ! isset( $gateways['stripe'] ) ) {
+		if ( ! isset( $gateways['stripe_eu'] ) ) {
 			return;
 		}
 
@@ -973,7 +975,7 @@ class WC_Stripe_Payment_Request {
 	/**
 	 * Returns true if a the provided product is supported, false otherwise.
 	 *
-	 * @param WC_Product $param  The product that's being checked for support.
+	 * @param \WC_Product $param  The product that's being checked for support.
 	 *
 	 * @since   5.3.0
 	 * @version 5.3.0
@@ -985,7 +987,7 @@ class WC_Stripe_Payment_Request {
 		}
 
 		// Trial subscriptions with shipping are not supported.
-		if ( class_exists( 'WC_Subscriptions_Product' ) && $product->needs_shipping() && WC_Subscriptions_Product::get_trial_length( $product ) > 0 ) {
+		if ( class_exists( '\WC_Subscriptions_Product' ) && $product->needs_shipping() && \WC_Subscriptions_Product::get_trial_length( $product ) > 0 ) {
 			return false;
 		}
 
@@ -1121,14 +1123,14 @@ class WC_Stripe_Payment_Request {
 			if ( ! empty( $packages ) && WC()->customer->has_calculated_shipping() ) {
 				foreach ( $packages as $package_key => $package ) {
 					if ( empty( $package['rates'] ) ) {
-						throw new Exception( __( 'Unable to find shipping method for address.', 'woocommerce-gateway-stripe' ) );
+						throw new \Exception( __( 'Unable to find shipping method for address.', 'woocommerce-gateway-stripe' ) );
 					}
 
 					foreach ( $package['rates'] as $key => $rate ) {
 						if ( in_array( $rate->id, $shipping_rate_ids, true ) ) {
 							// The Payment Requests will try to load indefinitely if there are duplicate shipping
 							// option IDs.
-							throw new Exception( __( 'Unable to provide shipping options for Payment Requests.', 'woocommerce-gateway-stripe' ) );
+							throw new \Exception( __( 'Unable to provide shipping options for Payment Requests.', 'woocommerce-gateway-stripe' ) );
 						}
 						$shipping_rate_ids[]        = $rate->id;
 						$data['shipping_options'][] = [
@@ -1140,7 +1142,7 @@ class WC_Stripe_Payment_Request {
 					}
 				}
 			} else {
-				throw new Exception( __( 'Unable to find shipping method for address.', 'woocommerce-gateway-stripe' ) );
+				throw new \Exception( __( 'Unable to find shipping method for address.', 'woocommerce-gateway-stripe' ) );
 			}
 
 			// The first shipping option is automatically applied on the client.
@@ -1171,7 +1173,7 @@ class WC_Stripe_Payment_Request {
 
 			$data          += $this->build_display_items( $itemized_display_items );
 			$data['result'] = 'success';
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			$data          += $this->build_display_items( $itemized_display_items );
 			$data['result'] = 'invalid_shipping_address';
 		}
@@ -1240,13 +1242,13 @@ class WC_Stripe_Payment_Request {
 
 			if ( ! is_a( $product, 'WC_Product' ) ) {
 				/* translators: 1) The product Id */
-				throw new Exception( sprintf( __( 'Product with the ID (%1$s) cannot be found.', 'woocommerce-gateway-stripe' ), $product_id ) );
+				throw new \Exception( sprintf( __( 'Product with the ID (%1$s) cannot be found.', 'woocommerce-gateway-stripe' ), $product_id ) );
 			}
 
 			if ( 'variable' === $product->get_type() && isset( $_POST['attributes'] ) ) {
 				$attributes = wc_clean( wp_unslash( $_POST['attributes'] ) );
 
-				$data_store   = WC_Data_Store::load( 'product' );
+				$data_store   = \WC_Data_Store::load( 'product' );
 				$variation_id = $data_store->find_matching_product_variation( $product, $attributes );
 
 				if ( ! empty( $variation_id ) ) {
@@ -1261,7 +1263,7 @@ class WC_Stripe_Payment_Request {
 
 			if ( ! $product->has_enough_stock( $qty ) ) {
 				/* translators: 1) product name 2) quantity in stock */
-				throw new Exception( sprintf( __( 'You cannot add that amount of "%1$s"; to the cart because there is not enough stock (%2$s remaining).', 'woocommerce-gateway-stripe' ), $product->get_name(), wc_format_stock_quantity_for_display( $product->get_stock_quantity(), $product ) ) );
+				throw new \Exception( sprintf( __( 'You cannot add that amount of "%1$s"; to the cart because there is not enough stock (%2$s remaining).', 'woocommerce-gateway-stripe' ), $product->get_name(), wc_format_stock_quantity_for_display( $product->get_stock_quantity(), $product ) ) );
 			}
 
 			$total = $qty * $this->get_product_price( $product ) + $addon_value;
@@ -1310,7 +1312,7 @@ class WC_Stripe_Payment_Request {
 			$data['country_code']    = substr( get_option( 'woocommerce_default_country' ), 0, 2 );
 
 			wp_send_json( $data );
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			wp_send_json( [ 'error' => wp_strip_all_tags( $e->getMessage() ) ] );
 		}
 	}
@@ -1342,7 +1344,7 @@ class WC_Stripe_Payment_Request {
 		if ( ( 'variable' === $product_type || 'variable-subscription' === $product_type ) && isset( $_POST['attributes'] ) ) {
 			$attributes = wc_clean( wp_unslash( $_POST['attributes'] ) );
 
-			$data_store   = WC_Data_Store::load( 'product' );
+			$data_store   = \WC_Data_Store::load( 'product' );
 			$variation_id = $data_store->find_matching_product_variation( $product, $attributes );
 
 			WC()->cart->add_to_cart( $product->get_id(), $qty, $variation_id, $attributes );
@@ -1392,21 +1394,21 @@ class WC_Stripe_Payment_Request {
 		// @reykjalin: This HK specific sanitazation *should be removed* once Apple Pay fix
 		// the address bug. More info on that in pc4etw-bY-p2.
 		if ( 'HK' === $billing_country ) {
-			include_once WC_STRIPE_PLUGIN_PATH . '/includes/constants/class-wc-stripe-hong-kong-states.php';
+			include_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/constants/class-wc-stripe-hong-kong-states.php';
 
-			if ( ! WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $billing_state ) ) ) {
+			if ( ! \WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $billing_state ) ) ) {
 				$billing_postcode = ! empty( $_POST['billing_postcode'] ) ? wc_clean( wp_unslash( $_POST['billing_postcode'] ) ) : '';
-				if ( WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $billing_postcode ) ) ) {
+				if ( \WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $billing_postcode ) ) ) {
 					$billing_state = $billing_postcode;
 				}
 			}
 		}
 		if ( 'HK' === $shipping_country ) {
-			include_once WC_STRIPE_PLUGIN_PATH . '/includes/constants/class-wc-stripe-hong-kong-states.php';
+			include_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/constants/class-wc-stripe-hong-kong-states.php';
 
-			if ( ! WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $shipping_state ) ) ) {
+			if ( ! \WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $shipping_state ) ) ) {
 				$shipping_postcode = ! empty( $_POST['shipping_postcode'] ) ? wc_clean( wp_unslash( $_POST['shipping_postcode'] ) ) : '';
-				if ( WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $shipping_postcode ) ) ) {
+				if ( \WC_Stripe_Hong_Kong_States::is_valid_state( strtolower( $shipping_postcode ) ) ) {
 					$shipping_state = $shipping_postcode;
 				}
 			}
@@ -1465,8 +1467,8 @@ class WC_Stripe_Payment_Request {
 	 */
 	public function get_normalized_state_from_pr_states( $state, $country ) {
 		// Include Payment Request API State list for compatibility with WC countries/states.
-		include_once WC_STRIPE_PLUGIN_PATH . '/includes/constants/class-wc-stripe-payment-request-button-states.php';
-		$pr_states = WC_Stripe_Payment_Request_Button_States::STATES;
+		include_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/constants/class-wc-stripe-payment-request-button-states.php';
+		$pr_states = \WC_Stripe_Payment_Request_Button_States::STATES;
 
 		if ( ! isset( $pr_states[ $country ] ) ) {
 			return $state;
@@ -1552,7 +1554,7 @@ class WC_Stripe_Payment_Request {
 	 * @since 5.1.0
 	 */
 	public function validate_state() {
-		$wc_checkout     = WC_Checkout::instance();
+		$wc_checkout     = \WC_Checkout::instance();
 		$posted_data     = $wc_checkout->get_posted_data();
 		$checkout_fields = $wc_checkout->get_checkout_fields();
 		$countries       = WC()->countries->get_countries();
@@ -1630,7 +1632,7 @@ class WC_Stripe_Payment_Request {
 
 		WC()->shipping->reset_shipping();
 
-		if ( $postcode && WC_Validation::is_postcode( $postcode, $country ) ) {
+		if ( $postcode && \WC_Validation::is_postcode( $postcode, $country ) ) {
 			$postcode = wc_format_postcode( $postcode, $country );
 		}
 

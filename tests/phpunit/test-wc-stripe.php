@@ -1,5 +1,8 @@
 <?php
 
+use \ElementorStripeEu\WC_Stripe_Helper;
+use \ElementorStripeEu\WC_Stripe_Feature_Flags;
+
 class WC_Stripe_Test extends WP_UnitTestCase {
 
 	/**
@@ -13,12 +16,12 @@ class WC_Stripe_Test extends WP_UnitTestCase {
 	}
 
 	public function test_constants_defined() {
-		$this->assertTrue( defined( 'WC_STRIPE_VERSION' ) );
-		$this->assertTrue( defined( 'WC_STRIPE_MIN_PHP_VER' ) );
-		$this->assertTrue( defined( 'WC_STRIPE_MIN_WC_VER' ) );
-		$this->assertTrue( defined( 'WC_STRIPE_MAIN_FILE' ) );
-		$this->assertTrue( defined( 'WC_STRIPE_PLUGIN_URL' ) );
-		$this->assertTrue( defined( 'WC_STRIPE_PLUGIN_PATH' ) );
+		$this->assertTrue( defined( 'WC_STRIPE_EU_VERSION' ) );
+		$this->assertTrue( defined( 'WC_STRIPE_EU_MIN_PHP_VER' ) );
+		$this->assertTrue( defined( 'WC_STRIPE_EU_MIN_WC_VER' ) );
+		$this->assertTrue( defined( 'WC_STRIPE_EU_MAIN_FILE' ) );
+		$this->assertTrue( defined( 'WC_STRIPE_EU_PLUGIN_URL' ) );
+		$this->assertTrue( defined( 'WC_STRIPE_EU_PLUGIN_PATH' ) );
 	}
 
 	/**
@@ -111,7 +114,7 @@ class WC_Stripe_Test extends WP_UnitTestCase {
 		$this->upe_helper->enable_upe_feature_flag();
 		$this->assertTrue( WC_Stripe_Feature_Flags::is_upe_preview_enabled() );
 
-		update_option( 'woocommerce_stripe_settings', [ 'upe_checkout_experience_enabled' => 'yes' ] );
+		update_option( 'woocommerce_stripe_eu_settings', [ 'upe_checkout_experience_enabled' => 'yes' ] );
 		$this->upe_helper->reload_payment_gateways();
 
 		$this->assertTrue( WC_Stripe_Feature_Flags::is_upe_checkout_enabled() );
@@ -136,16 +139,16 @@ class WC_Stripe_Test extends WP_UnitTestCase {
 	public function test_turning_on_upe_with_no_stripe_legacy_payment_methods_enabled_will_not_turn_on_the_upe_gateway_and_default_to_card_only() {
 		$this->upe_helper->enable_upe_feature_flag();
 		// Store default stripe options
-		update_option( 'woocommerce_stripe_settings', [] );
+		update_option( 'woocommerce_stripe_eu_settings', [] );
 
-		$stripe_settings = get_option( 'woocommerce_stripe_settings' );
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->assertEquals( 'no', $stripe_settings['enabled'] );
 		$this->assertEquals( 'no', $stripe_settings['upe_checkout_experience_enabled'] );
 
 		$stripe_settings['upe_checkout_experience_enabled'] = 'yes';
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
-		$stripe_settings = get_option( 'woocommerce_stripe_settings' );
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings' );
 		// Because no Stripe LPM's were enabled when UPE was enabled, the Stripe gateway is not enabled yet.
 		$this->assertEquals( 'no', $stripe_settings['enabled'] );
 		$this->assertEquals( 'yes', $stripe_settings['upe_checkout_experience_enabled'] );
@@ -162,9 +165,9 @@ class WC_Stripe_Test extends WP_UnitTestCase {
 		$this->upe_helper->reload_payment_gateways();
 
 		// Initialize default stripe settings, turn on UPE.
-		update_option( 'woocommerce_stripe_settings', [ 'upe_checkout_experience_enabled' => 'yes' ] );
+		update_option( 'woocommerce_stripe_eu_settings', [ 'upe_checkout_experience_enabled' => 'yes' ] );
 
-		$stripe_settings = get_option( 'woocommerce_stripe_settings' );
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->assertEquals( 'yes', $stripe_settings['enabled'] );
 		$this->assertEquals( 'yes', $stripe_settings['upe_checkout_experience_enabled'] );
 		$this->assertNotContains( 'card', $stripe_settings['upe_checkout_experience_accepted_payments'] );
@@ -179,14 +182,14 @@ class WC_Stripe_Test extends WP_UnitTestCase {
 
 		// Enable the EPS UPE method. Now when UPE is disabled, the EPS LPM should be enabled.
 		$stripe_settings['upe_checkout_experience_accepted_payments'][] = 'eps';
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
 		// Turn UPE off.
 		$stripe_settings['upe_checkout_experience_enabled'] = 'no';
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
-		// Check that the main 'stripe' gateway was disabled because the 'card' UPE method was not enabled.
-		$stripe_settings = get_option( 'woocommerce_stripe_settings' );
+		// Check that the main 'stripe_eu' gateway was disabled because the 'card' UPE method was not enabled.
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->assertEquals( 'no', $stripe_settings['enabled'] );
 		// Check that the correct LPMs were re-enabled.
 		$giropay_settings = get_option( 'woocommerce_stripe_giropay_settings' );

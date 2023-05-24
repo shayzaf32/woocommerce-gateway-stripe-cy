@@ -1,10 +1,13 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'WC_Stripe_Connect_REST_Oauth_Init_Controller' ) ) {
+
+if ( ! class_exists( '\ElementorStripeEu\WC_Stripe_Connect_REST_Oauth_Init_Controller' ) ) {
 	/**
 	 * Stripe Connect Oauth Init controller class.
 	 */

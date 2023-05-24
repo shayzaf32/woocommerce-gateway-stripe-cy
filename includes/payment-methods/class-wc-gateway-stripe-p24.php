@@ -3,10 +3,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \ElementorStripeEu\{
+	WC_Stripe_Logger,
+	WC_Stripe_Exception,
+	WC_Stripe_Helper,
+	WC_Stripe_API,
+	WC_Stripe_Payment_Gateway,
+	WC_Gateway_Stripe_Eu,
+};
+
 /**
  * Class that handles P24 payment method.
  *
- * @extends WC_Gateway_Stripe
+ * @extends WC_Gateway_Stripe_Eu
  *
  * @since 4.0.0
  */
@@ -79,7 +88,7 @@ class WC_Gateway_Stripe_P24 extends WC_Stripe_Payment_Gateway {
 		// Load the settings.
 		$this->init_settings();
 
-		$main_settings              = get_option( 'woocommerce_stripe_settings' );
+		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->title                = $this->get_option( 'title' );
 		$this->description          = $this->get_option( 'description' );
 		$this->enabled              = $this->get_option( 'enabled' );
@@ -163,7 +172,7 @@ class WC_Gateway_Stripe_P24 extends WC_Stripe_Payment_Gateway {
 	 * Initialize Gateway Settings Form Fields.
 	 */
 	public function init_form_fields() {
-		$this->form_fields = require WC_STRIPE_PLUGIN_PATH . '/includes/admin/stripe-p24-settings.php';
+		$this->form_fields = require WC_STRIPE_EU_PLUGIN_PATH . '/includes/admin/stripe-p24-settings.php';
 	}
 
 	/**
@@ -246,7 +255,7 @@ class WC_Gateway_Stripe_P24 extends WC_Stripe_Payment_Gateway {
 
 			if ( $create_account ) {
 				$new_customer_id     = $order->get_customer_id();
-				$new_stripe_customer = new WC_Stripe_Customer( $new_customer_id );
+				$new_stripe_customer = new \ElementorStripeEu\WC_Stripe_Customer( $new_customer_id );
 				$new_stripe_customer->create_customer();
 			}
 

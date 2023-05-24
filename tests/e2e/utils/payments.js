@@ -70,19 +70,19 @@ export async function fillCardDetails( page, card ) {
 	} else {
 		await page
 			.frameLocator(
-				'#stripe-card-element iframe[name^="__privateStripeFrame"]'
+				'#stripe-eu-card-element iframe[name^="__privateStripeFrame"]'
 			)
 			.locator( '[name="cardnumber"]' )
 			.fill( card.number );
 		await page
 			.frameLocator(
-				'#stripe-exp-element iframe[name^="__privateStripeFrame"]'
+				'#stripe-eu-exp-element iframe[name^="__privateStripeFrame"]'
 			)
 			.locator( '[name="exp-date"]' )
 			.fill( card.expires.month + card.expires.year );
 		await page
 			.frameLocator(
-				'#stripe-cvc-element iframe[name^="__privateStripeFrame"]'
+				'#stripe-eu-cvc-element iframe[name^="__privateStripeFrame"]'
 			)
 			.locator( '[name="cvc"]' )
 			.fill( card.cvc );
@@ -170,7 +170,7 @@ export async function setupCheckout( page, billingDetails = null ) {
 		}
 	}
 
-	await page.click( '.wc_payment_method.payment_method_stripe' );
+	await page.click( '.wc_payment_method.payment_method_stripe_eu' );
 }
 
 /**

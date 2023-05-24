@@ -1,8 +1,13 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use \ElementorStripeEu\WC_Stripe_Woo_Compat_Utils;
+use \ElementorStripeEu\WC_Stripe_UPE_Availability_Note;
 
 /**
  * Class that adds Inbox notifications.
@@ -38,8 +43,8 @@ class WC_Stripe_Inbox_Notes {
 		}
 
 		try {
-			WC_Data_Store::load( 'admin-note' );
-		} catch ( Exception $e ) {
+			\WC_Data_Store::load( 'admin-note' );
+		} catch ( \Exception $e ) {
 			return false;
 		}
 
@@ -51,11 +56,11 @@ class WC_Stripe_Inbox_Notes {
 			return;
 		}
 
-		require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
+		require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
 		WC_Stripe_UPE_Availability_Note::init();
 
-		require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-stripelink-note.php';
-		WC_Stripe_UPE_StripeLink_Note::init( WC_Stripe::get_instance()->get_main_stripe_gateway() );
+		require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-stripelink-note.php';
+		WC_Stripe_UPE_StripeLink_Note::init( \WC_Eu_Stripe::get_instance()->get_main_stripe_gateway() );
 	}
 
 	public static function get_campaign_2020_cutoff() {
@@ -111,7 +116,7 @@ class WC_Stripe_Inbox_Notes {
 		}
 
 		// Make sure Apple Pay is enabled and setup is successful.
-		$stripe_settings       = get_option( 'woocommerce_stripe_settings', [] );
+		$stripe_settings       = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$stripe_enabled        = isset( $stripe_settings['enabled'] ) && 'yes' === $stripe_settings['enabled'];
 		$button_enabled        = isset( $stripe_settings['payment_request'] ) && 'yes' === $stripe_settings['payment_request'];
 		$verification_complete = isset( $stripe_settings['apple_pay_domain_set'] ) && 'yes' === $stripe_settings['apple_pay_domain_set'];

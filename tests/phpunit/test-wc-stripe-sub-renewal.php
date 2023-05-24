@@ -4,7 +4,7 @@
  *
  * The responses from HTTP requests are mocked using the WP filter `pre_http_request`.
  *
- * There are a few methods that need to be mocked in the class WC_Gateway_Stripe, which is
+ * There are a few methods that need to be mocked in the class WC_Gateway_Stripe_Eu, which is
  * why that class is mocked even though the method under test is part of that class.
  *
  * @package     WooCommerce_Stripe/Classes/WC_Stripe_Subscription_Renewal_Test
@@ -49,19 +49,19 @@ class WC_Stripe_Subscription_Renewal_Test extends WP_UnitTestCase {
 
 		$this->statement_descriptor = 'This is a statement descriptor.';
 
-		$stripe_settings = get_option( 'woocommerce_stripe_settings', [] );
+		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
 		// Disable UPE.
-		$stripe_settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] = 'no';
+		$stripe_settings[ \ElementorStripeEu\WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] = 'no';
 		// Set statement descriptor.
 		$stripe_settings['statement_descriptor'] = $this->statement_descriptor;
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 	}
 
 	/**
 	 * Tears down the stuff we set up.
 	 */
 	public function tear_down() {
-		delete_option( 'woocommerce_stripe_settings' );
+		delete_option( 'woocommerce_stripe_eu_settings' );
 
 		parent::tear_down();
 	}
@@ -90,7 +90,7 @@ class WC_Stripe_Subscription_Renewal_Test extends WP_UnitTestCase {
 		$payments_intents_api_endpoint = 'https://api.stripe.com/v1/payment_intents';
 		$urls_used                     = [];
 
-		$renewal_order->set_payment_method( 'stripe' );
+		$renewal_order->set_payment_method( 'stripe_eu' );
 
 		// Arrange: Mock prepare_order_source() so that we have a customer and source.
 		$this->wc_gateway_stripe

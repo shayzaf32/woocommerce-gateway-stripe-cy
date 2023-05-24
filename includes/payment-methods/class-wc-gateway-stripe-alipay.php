@@ -3,10 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \ElementorStripeEu\WC_Stripe_Exception;
+use \ElementorStripeEu\WC_Stripe_Payment_Gateway;
+use \ElementorStripeEu\WC_Gateway_Stripe_Eu;
+
 /**
  * Class that handles Alipay payment method.
  *
- * @extends WC_Gateway_Stripe
+ * @extends WC_Gateway_Stripe_Eu
  *
  * @since 4.0.0
  */
@@ -79,7 +83,7 @@ class WC_Gateway_Stripe_Alipay extends WC_Stripe_Payment_Gateway {
 		// Load the settings.
 		$this->init_settings();
 
-		$main_settings              = get_option( 'woocommerce_stripe_settings' );
+		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->title                = $this->get_option( 'title' );
 		$this->description          = $this->get_option( 'description' );
 		$this->enabled              = $this->get_option( 'enabled' );
@@ -175,7 +179,7 @@ class WC_Gateway_Stripe_Alipay extends WC_Stripe_Payment_Gateway {
 	 * Initialize Gateway Settings Form Fields.
 	 */
 	public function init_form_fields() {
-		$this->form_fields = require WC_STRIPE_PLUGIN_PATH . '/includes/admin/stripe-alipay-settings.php';
+		$this->form_fields = require WC_STRIPE_EU_PLUGIN_PATH . '/includes/admin/stripe-alipay-settings.php';
 	}
 
 	/**
@@ -234,7 +238,7 @@ class WC_Gateway_Stripe_Alipay extends WC_Stripe_Payment_Gateway {
 			$post_data['statement_descriptor'] = WC_Stripe_Helper::clean_statement_descriptor( $this->statement_descriptor );
 		}
 
-		WC_Stripe_Logger::log( 'Info: Begin creating Alipay source' );
+		\ElementorStripeEu\WC_Stripe_Logger::log( 'Info: Begin creating Alipay source' );
 
 		return WC_Stripe_API::request( apply_filters( 'wc_stripe_alipay_source', $post_data, $order ), 'sources' );
 	}
@@ -262,7 +266,7 @@ class WC_Gateway_Stripe_Alipay extends WC_Stripe_Payment_Gateway {
 
 			if ( $create_account ) {
 				$new_customer_id     = $order->get_customer_id();
-				$new_stripe_customer = new WC_Stripe_Customer( $new_customer_id );
+				$new_stripe_customer = new \ElementorStripeEu\WC_Stripe_Customer( $new_customer_id );
 				$new_stripe_customer->create_customer();
 			}
 
@@ -277,7 +281,7 @@ class WC_Gateway_Stripe_Alipay extends WC_Stripe_Payment_Gateway {
 			$order->update_meta_data( '_stripe_source_id', $response->id );
 			$order->save();
 
-			WC_Stripe_Logger::log( 'Info: Redirecting to Alipay...' );
+			\ElementorStripeEu\WC_Stripe_Logger::log( 'Info: Redirecting to Alipay...' );
 
 			return [
 				'result'   => 'success',
@@ -285,7 +289,7 @@ class WC_Gateway_Stripe_Alipay extends WC_Stripe_Payment_Gateway {
 			];
 		} catch ( WC_Stripe_Exception $e ) {
 			wc_add_notice( $e->getLocalizedMessage(), 'error' );
-			WC_Stripe_Logger::log( 'Error: ' . $e->getMessage() );
+			\ElementorStripeEu\WC_Stripe_Logger::log( 'Error: ' . $e->getMessage() );
 
 			do_action( 'wc_gateway_stripe_process_payment_error', $e, $order );
 

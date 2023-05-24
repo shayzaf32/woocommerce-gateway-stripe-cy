@@ -1,5 +1,7 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -7,13 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
 * Class that handles UPE payment method.
 *
-* @extends WC_Gateway_Stripe
+* @extends WC_Gateway_Stripe_Eu
 *
 * @since 5.5.0
 */
-class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
+class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe_Eu {
 
-	const ID = 'stripe';
+	const ID = 'stripe_eu';
 
 	/**
 	 * Upe Available Methods
@@ -22,16 +24,16 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 	 */
 	const UPE_AVAILABLE_METHODS = [
 		WC_Stripe_UPE_Payment_Method_CC::class,
-		WC_Stripe_UPE_Payment_Method_Giropay::class,
-		WC_Stripe_UPE_Payment_Method_Eps::class,
-		WC_Stripe_UPE_Payment_Method_Bancontact::class,
-		WC_Stripe_UPE_Payment_Method_Boleto::class,
-		WC_Stripe_UPE_Payment_Method_Ideal::class,
-		WC_Stripe_UPE_Payment_Method_Oxxo::class,
-		WC_Stripe_UPE_Payment_Method_Sepa::class,
-		WC_Stripe_UPE_Payment_Method_P24::class,
-		WC_Stripe_UPE_Payment_Method_Sofort::class,
-		WC_Stripe_UPE_Payment_Method_Link::class,
+		//WC_Stripe_UPE_Payment_Method_Giropay::class,
+		//WC_Stripe_UPE_Payment_Method_Eps::class,
+		//WC_Stripe_UPE_Payment_Method_Bancontact::class,
+		//WC_Stripe_UPE_Payment_Method_Boleto::class,
+		//WC_Stripe_UPE_Payment_Method_Ideal::class,
+		//WC_Stripe_UPE_Payment_Method_Oxxo::class,
+		//WC_Stripe_UPE_Payment_Method_Sepa::class,
+		//WC_Stripe_UPE_Payment_Method_P24::class,
+		//WC_Stripe_UPE_Payment_Method_Sofort::class,
+		//WC_Stripe_UPE_Payment_Method_Link::class,
 	];
 
 	const UPE_APPEARANCE_TRANSIENT = 'wc_stripe_upe_appearance';
@@ -99,7 +101,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 	 */
 	public function __construct() {
 		$this->id           = self::ID;
-		$this->method_title = __( 'Stripe', 'woocommerce-gateway-stripe' );
+		$this->method_title = __( 'Stripe EU', 'woocommerce-gateway-stripe' );
 		/* translators: link */
 		$this->method_description = __( 'Accept debit and credit cards in 135+ currencies, methods such as SEPA, and one-touch checkout with Apple Pay.', 'woocommerce-gateway-stripe' );
 		$this->has_fields         = true;
@@ -128,7 +130,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 		// Check if pre-orders are enabled and add support for them.
 		$this->maybe_init_pre_orders();
 
-		$main_settings              = get_option( 'woocommerce_stripe_settings' );
+		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->title                = ! empty( $this->get_option( 'title_upe' ) ) ? $this->get_option( 'title_upe' ) : $this->form_fields['title_upe']['default'];
 		$this->description          = '';
 		$this->enabled              = $this->get_option( 'enabled' );
@@ -193,7 +195,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 	 * Initialize Gateway Settings Form Fields.
 	 */
 	public function init_form_fields() {
-		$this->form_fields = require WC_STRIPE_PLUGIN_PATH . '/includes/admin/stripe-settings.php';
+		$this->form_fields = require WC_STRIPE_EU_PLUGIN_PATH . '/includes/admin/stripe-settings.php';
 		unset( $this->form_fields['inline_cc_form'] );
 		unset( $this->form_fields['title'] );
 		unset( $this->form_fields['description'] );
@@ -219,8 +221,8 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 			return;
 		}
 
-		$asset_path   = WC_STRIPE_PLUGIN_PATH . '/build/checkout_upe.asset.php';
-		$version      = WC_STRIPE_VERSION;
+		$asset_path   = WC_STRIPE_EU_PLUGIN_PATH . '/build/checkout_upe.asset.php';
+		$version      = WC_STRIPE_EU_VERSION;
 		$dependencies = [];
 		if ( file_exists( $asset_path ) ) {
 			$asset        = require $asset_path;
@@ -233,7 +235,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 		}
 
 		wp_register_script(
-			'stripe',
+			'stripe_eu',
 			'https://js.stripe.com/v3/',
 			[],
 			'3.0',
@@ -242,8 +244,8 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 
 		wp_register_script(
 			'wc-stripe-upe-classic',
-			WC_STRIPE_PLUGIN_URL . '/build/upe_classic.js',
-			array_merge( [ 'stripe', 'wc-checkout' ], $dependencies ),
+			WC_STRIPE_EU_PLUGIN_URL . '/build/upe_classic.js',
+			array_merge( [ 'stripe_eu', 'wc-checkout' ], $dependencies ),
 			$version,
 			true
 		);
@@ -260,7 +262,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 
 		wp_register_style(
 			'wc-stripe-upe-classic',
-			WC_STRIPE_PLUGIN_URL . '/build/upe_classic.css',
+			WC_STRIPE_EU_PLUGIN_URL . '/build/upe_classic.css',
 			[],
 			$version
 		);
@@ -268,7 +270,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 		wp_enqueue_script( 'wc-stripe-upe-classic' );
 		wp_enqueue_style( 'wc-stripe-upe-classic' );
 
-		wp_register_style( 'stripelink_styles', plugins_url( 'assets/css/stripe-link.css', WC_STRIPE_MAIN_FILE ), [], WC_STRIPE_VERSION );
+		wp_register_style( 'stripelink_styles', plugins_url( 'assets/css/stripe-link.css', WC_STRIPE_EU_MAIN_FILE ), [], WC_STRIPE_EU_VERSION );
 		wp_enqueue_style( 'stripelink_styles' );
 	}
 
@@ -541,7 +543,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 					$request['customer'] = $customer_id;
 				} else {
 					$user                = $this->get_user_from_order( $order );
-					$customer            = new WC_Stripe_Customer( $user->ID );
+					$customer            = new \ElementorStripeEu\WC_Stripe_Customer( $user->ID );
 					$request['customer'] = $customer->update_or_create_customer();// Update customer or create customer if customer does not exist.
 				}
 
@@ -638,7 +640,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 				return $this->process_pre_order( $order_id );
 			}
 
-			$token                   = WC_Stripe_Payment_Tokens::get_token_from_request( $_POST );
+			$token                   = \ElementorStripeEu\WC_Stripe_Payment_Tokens::get_token_from_request( $_POST );
 			$payment_method          = $this->stripe_request( 'payment_methods/' . $token->get_token(), [], null, 'GET' );
 			$prepared_payment_method = $this->prepare_payment_method( $payment_method );
 
@@ -794,7 +796,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 			if ( $this->is_setup_intent_success_creation_redirection() ) {
 				if ( isset( $_GET['redirect_status'] ) && 'succeeded' === $_GET['redirect_status'] ) {
 					$user_id  = wp_get_current_user()->ID;
-					$customer = new WC_Stripe_Customer( $user_id );
+					$customer = new \ElementorStripeEu\WC_Stripe_Customer( $user_id );
 					$customer->clear_cache();
 					wc_add_notice( __( 'Payment method successfully added.', 'woocommerce-gateway-stripe' ) );
 
@@ -805,7 +807,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 						$setup_intent_id = isset( $_GET['setup_intent'] ) ? wc_clean( wp_unslash( $_GET['setup_intent'] ) ) : '';
 						$setup_intent    = $this->stripe_request( 'setup_intents/' . $setup_intent_id, [], null, 'GET' );
 
-						$customer_data         = WC_Stripe_Customer::map_customer_data( null, new WC_Customer( $user_id ) );
+						$customer_data         = \ElementorStripeEu\WC_Stripe_Customer::map_customer_data( null, new WC_Customer( $user_id ) );
 						$payment_method_object = $this->stripe_request(
 							'payment_methods/' . $setup_intent->payment_method,
 							[
@@ -949,7 +951,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 				$payment_method_object = $intent->payment_method;
 			}
 			$user                    = $this->get_user_from_order( $order );
-			$customer                = new WC_Stripe_Customer( $user->ID );
+			$customer                = new \ElementorStripeEu\WC_Stripe_Customer( $user->ID );
 			$prepared_payment_method = $this->prepare_payment_method( $payment_method_object );
 
 			$customer->clear_cache();
@@ -997,12 +999,12 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 	/**
 	 * Save payment method to order.
 	 *
-	 * @param WC_Order $order For to which the source applies.
-	 * @param stdClass $payment_method Stripe Payment Method.
+	 * @param \WC_Order $order For to which the source applies.
+	 * @param \stdClass $payment_method Stripe Payment Method.
 	 */
 	public function save_payment_method_to_order( $order, $payment_method ) {
 		if ( $payment_method->customer ) {
-			$order->update_meta_data( '_stripe_customer_id', $payment_method->customer );
+			$order->update_meta_data( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, $payment_method->customer );
 		}
 		// Save the payment method id as `source_id`, because we use both `sources` and `payment_methods` APIs.
 		$order->update_meta_data( '_stripe_source_id', $payment_method->payment_method );
@@ -1348,7 +1350,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 
 			$payment_method = $this->payment_methods[ $payment_method_object->type ];
 
-			$customer = new WC_Stripe_Customer( wp_get_current_user()->ID );
+			$customer = new \ElementorStripeEu\WC_Stripe_Customer( wp_get_current_user()->ID );
 			$customer->clear_cache();
 
 			return $payment_method->create_payment_token_for_user( $user->ID, $payment_method_object );
@@ -1366,7 +1368,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe {
 	 *
 	 * @param string   $path   Stripe API endpoint path to query.
 	 * @param string   $params Parameters for request body.
-	 * @param WC_Order $order  WC Order for request.
+	 * @param \WC_Order $order  WC Order for request.
 	 * @param string   $method HTTP method for request.
 	 *
 	 * @return object JSON response object.

@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -10,6 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WC_Stripe_Customer {
 
+	const STRIPE_EU_CUSTOMER_ID = '_stripe_eu_customer_id';
+
 	/**
 	 * String prefix for Stripe payment methods request transient.
 	 */
@@ -20,7 +25,7 @@ class WC_Stripe_Customer {
 	 */
 	const STRIPE_PAYMENT_METHODS = [
 		WC_Stripe_UPE_Payment_Method_CC::STRIPE_ID,
-		WC_Stripe_UPE_Payment_Method_Sepa::STRIPE_ID,
+		\WC_Stripe_UPE_Payment_Method_Sepa::STRIPE_ID,
 	];
 
 	/**
@@ -102,7 +107,7 @@ class WC_Stripe_Customer {
 	/**
 	 * Get user object.
 	 *
-	 * @return WP_User
+	 * @return \WP_User
 	 */
 	protected function get_user() {
 		return $this->get_user_id() ? get_user_by( 'id', $this->get_user_id() ) : false;
@@ -180,7 +185,7 @@ class WC_Stripe_Customer {
 	 * Create a customer via API.
 	 *
 	 * @param array $args
-	 * @return WP_Error|int
+	 * @return \WP_Error|int
 	 */
 	public function create_customer( $args = [] ) {
 		$args     = $this->generate_customer_request( $args );
@@ -294,7 +299,7 @@ class WC_Stripe_Customer {
 	 * Add a source for this stripe customer.
 	 *
 	 * @param string $source_id
-	 * @return WP_Error|int
+	 * @return \WP_Error|int
 	 */
 	public function add_source( $source_id ) {
 		$response = WC_Stripe_API::get_payment_method( $source_id );
@@ -306,7 +311,7 @@ class WC_Stripe_Customer {
 		// Add token to WooCommerce.
 		$wc_token = false;
 
-		if ( $this->get_user_id() && class_exists( 'WC_Payment_Token_CC' ) ) {
+		if ( $this->get_user_id() && class_exists( '\WC_Payment_Token_CC' ) ) {
 			if ( ! empty( $response->type ) ) {
 				switch ( $response->type ) {
 					case 'alipay':
@@ -319,9 +324,9 @@ class WC_Stripe_Customer {
 						break;
 					default:
 						if ( WC_Stripe_Helper::is_card_payment_method( $response ) ) {
-							$wc_token = new WC_Payment_Token_CC();
+							$wc_token = new \WC_Payment_Token_CC();
 							$wc_token->set_token( $response->id );
-							$wc_token->set_gateway_id( 'stripe' );
+							$wc_token->set_gateway_id( 'stripe_eu' );
 							$wc_token->set_card_type( strtolower( $response->card->brand ) );
 							$wc_token->set_last4( $response->card->last4 );
 							$wc_token->set_expiry_month( $response->card->exp_month );
@@ -331,9 +336,9 @@ class WC_Stripe_Customer {
 				}
 			} else {
 				// Legacy.
-				$wc_token = new WC_Payment_Token_CC();
+				$wc_token = new \WC_Payment_Token_CC();
 				$wc_token->set_token( $response->id );
-				$wc_token->set_gateway_id( 'stripe' );
+				$wc_token->set_gateway_id( 'stripe_eu' );
 				$wc_token->set_card_type( strtolower( $response->brand ) );
 				$wc_token->set_last4( $response->last4 );
 				$wc_token->set_expiry_month( $response->exp_month );
@@ -355,7 +360,7 @@ class WC_Stripe_Customer {
 	 * Attaches a source to the Stripe customer.
 	 *
 	 * @param string $source_id The ID of the new source.
-	 * @return object|WP_Error Either a source object, or a WP error.
+	 * @return object|\WP_Error Either a source object, or a WP error.
 	 */
 	public function attach_source( $source_id ) {
 		if ( ! $this->get_id() ) {
@@ -377,7 +382,7 @@ class WC_Stripe_Customer {
 				return $response;
 			}
 		} elseif ( empty( $response->id ) ) {
-			return new WP_Error( 'error', __( 'Unable to add payment source.', 'woocommerce-gateway-stripe' ) );
+			return new \WP_Error( 'error', __( 'Unable to add payment source.', 'woocommerce-gateway-stripe' ) );
 		} else {
 			return $response;
 		}
@@ -434,7 +439,7 @@ class WC_Stripe_Customer {
 		$payment_methods = get_transient( self::PAYMENT_METHODS_TRANSIENT_KEY . $payment_method_type . $this->get_id() );
 
 		if ( false === $payment_methods ) {
-			$params   = WC_Stripe_UPE_Payment_Method_Sepa::STRIPE_ID === $payment_method_type ? '?expand[]=data.sepa_debit.generated_from.charge&expand[]=data.sepa_debit.generated_from.setup_attempt' : '';
+			$params   = \WC_Stripe_UPE_Payment_Method_Sepa::STRIPE_ID === $payment_method_type ? '?expand[]=data.sepa_debit.generated_from.charge&expand[]=data.sepa_debit.generated_from.setup_attempt' : '';
 			$response = WC_Stripe_API::request(
 				[
 					'customer' => $this->get_id(),
@@ -576,7 +581,7 @@ class WC_Stripe_Customer {
 	 * @return string|bool  Either the Stripe ID or false.
 	 */
 	public function get_id_from_meta( $user_id ) {
-		return get_user_option( '_stripe_customer_id', $user_id );
+		return get_user_option( self::STRIPE_EU_CUSTOMER_ID, $user_id );
 	}
 
 	/**
@@ -585,14 +590,14 @@ class WC_Stripe_Customer {
 	 * @param string $id The Stripe customer ID.
 	 */
 	public function update_id_in_meta( $id ) {
-		update_user_option( $this->get_user_id(), '_stripe_customer_id', $id, false );
+		update_user_option( $this->get_user_id(), self::STRIPE_EU_CUSTOMER_ID, $id, false );
 	}
 
 	/**
 	 * Deletes the user ID from the meta table with the right key.
 	 */
 	public function delete_id_from_meta() {
-		delete_user_option( $this->get_user_id(), '_stripe_customer_id', false );
+		delete_user_option( $this->get_user_id(), self::STRIPE_EU_CUSTOMER_ID, false );
 	}
 
 	/**

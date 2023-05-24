@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -213,7 +216,7 @@ trait WC_Stripe_Pre_Orders_Trait {
 	/**
 	 * Process a pre-order payment when the pre-order is released.
 	 *
-	 * @param WC_Order $order
+	 * @param \WC_Order $order
 	 * @param bool     $retry
 	 *
 	 * @return void
@@ -227,7 +230,7 @@ trait WC_Stripe_Pre_Orders_Trait {
 
 			if ( ! empty( $response->error ) && ! $is_authentication_required ) {
 				if ( ! $retry ) {
-					throw new Exception( $response->error->message );
+					throw new \Exception( $response->error->message );
 				}
 				$this->remove_order_source_before_retry( $order );
 				$this->process_pre_order_release_payment( $order, false );
@@ -242,7 +245,7 @@ trait WC_Stripe_Pre_Orders_Trait {
 					$order->save();
 				}
 
-				WC_Emails::instance();
+				\WC_Emails::instance();
 
 				do_action( 'wc_gateway_stripe_process_payment_authentication_required', $order );
 
@@ -251,7 +254,7 @@ trait WC_Stripe_Pre_Orders_Trait {
 				// Successful
 				$this->process_response( end( $response->charges->data ), $order );
 			}
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			$error_message = is_callable( [ $e, 'getLocalizedMessage' ] ) ? $e->getLocalizedMessage() : $e->getMessage();
 			/* translators: error message */
 			$order_note = sprintf( __( 'Stripe Transaction Failed (%s)', 'woocommerce-gateway-stripe' ), $error_message );

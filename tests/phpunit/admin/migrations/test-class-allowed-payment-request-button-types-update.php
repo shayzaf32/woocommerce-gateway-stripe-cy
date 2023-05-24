@@ -13,12 +13,12 @@ class Allowed_Payment_Request_Button_Types_Update_Test extends WP_UnitTestCase {
 	/**
 	 * WCPay gateway mock.
 	 *
-	 * @var MockObject|WC_Gateway_Stripe
+	 * @var MockObject|\ElementorStripeEu\WC_Gateway_Stripe_Eu
 	 */
 	private $gateway_mock;
 
 	/**
-	 * @var Allowed_Payment_Request_Button_Types_Update
+	 * @var \ElementorStripeEu\Allowed_Payment_Request_Button_Types_Update
 	 */
 	private $migration;
 
@@ -30,10 +30,10 @@ class Allowed_Payment_Request_Button_Types_Update_Test extends WP_UnitTestCase {
 			return;
 		}
 
-		$this->gateway_mock = $this->getMockBuilder( WC_Gateway_Stripe::class )
+		$this->gateway_mock = $this->getMockBuilder( \ElementorStripeEu\WC_Gateway_Stripe_Eu::class )
 								   ->disableOriginalConstructor()
 								   ->getMock();
-		$this->migration    = $this->getMockBuilder( Allowed_Payment_Request_Button_Types_Update::class )
+		$this->migration    = $this->getMockBuilder( \ElementorStripeEu\Allowed_Payment_Request_Button_Types_Update::class )
 								   ->disableOriginalConstructor()
 								   ->setMethods( [ 'get_gateway' ] )
 								   ->getMock();

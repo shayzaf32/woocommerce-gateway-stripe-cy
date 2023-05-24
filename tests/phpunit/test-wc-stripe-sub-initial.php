@@ -4,7 +4,7 @@
  *
  * The responses from HTTP requests are mocked using the WP filter `pre_http_request`.
  *
- * There are a few methods that need to be mocked in the class WC_Gateway_Stripe, which is
+ * There are a few methods that need to be mocked in the class WC_Gateway_Stripe_Eu, which is
  * why that class is mocked even though the method under test is part of that class.
  *
  * @package WooCommerce_Stripe/Classes/WC_Stripe_Subscription_Initial_Test
@@ -34,7 +34,7 @@ class WC_Stripe_Subscription_Initial_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->wc_gateway_stripe = $this->getMockBuilder( 'WC_Gateway_Stripe' )
+		$this->wc_gateway_stripe = $this->getMockBuilder( '\ElementorStripeEu\WC_Gateway_Stripe_Eu' )
 			->disableOriginalConstructor()
 			->setMethods( [ 'prepare_source', 'has_subscription' ] )
 			->getMock();
@@ -42,7 +42,7 @@ class WC_Stripe_Subscription_Initial_Test extends WP_UnitTestCase {
 		// Mocked in order to get metadata[payment_type] = recurring in the HTTP request.
 		$this->statement_descriptor = 'This is a statement descriptor.';
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'statement_descriptor' => $this->statement_descriptor,
 			]
@@ -53,7 +53,7 @@ class WC_Stripe_Subscription_Initial_Test extends WP_UnitTestCase {
 	 * Tears down the stuff we set up.
 	 */
 	public function tear_down() {
-		delete_option( 'woocommerce_stripe_settings' );
+		delete_option( 'woocommerce_stripe_eu_settings' );
 
 		parent::tear_down();
 	}
@@ -79,7 +79,7 @@ class WC_Stripe_Subscription_Initial_Test extends WP_UnitTestCase {
 		$intents_api_endpoint = 'https://api.stripe.com/v1/payment_intents';
 		$urls_used            = [];
 
-		$initial_order->set_payment_method( 'stripe' );
+		$initial_order->set_payment_method( 'stripe_eu' );
 		$initial_order->save();
 
 		// Arrange: Mock prepare_source() so that we have a customer and source.

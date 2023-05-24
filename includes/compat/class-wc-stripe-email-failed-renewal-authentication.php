@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -6,13 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Failed Renewal/Pre-Order Authentication Notification
  *
- * @extends WC_Email_Customer_Invoice
+ * @extends \WC_Email_Customer_Invoice
  */
 class WC_Stripe_Email_Failed_Renewal_Authentication extends WC_Stripe_Email_Failed_Authentication {
 	/**
 	 * Constructor.
 	 *
-	 * @param WC_Email[] $email_classes All existing instances of WooCommerce emails.
+	 * @param \WC_Email[] $email_classes All existing instances of WooCommerce emails.
 	 */
 	public function __construct( $email_classes = [] ) {
 		$this->id             = 'failed_renewal_authentication';
@@ -22,7 +25,7 @@ class WC_Stripe_Email_Failed_Renewal_Authentication extends WC_Stripe_Email_Fail
 
 		$this->template_html  = 'emails/failed-renewal-authentication.php';
 		$this->template_plain = 'emails/plain/failed-renewal-authentication.php';
-		$this->template_base  = plugin_dir_path( WC_STRIPE_MAIN_FILE ) . 'templates/';
+		$this->template_base  = plugin_dir_path( WC_STRIPE_EU_MAIN_FILE ) . 'templates/';
 
 		// Triggers the email at the correct hook.
 		add_action( 'wc_gateway_stripe_process_payment_authentication_required', [ $this, 'trigger' ] );
@@ -38,7 +41,7 @@ class WC_Stripe_Email_Failed_Renewal_Authentication extends WC_Stripe_Email_Fail
 	/**
 	 * Triggers the email while also disconnecting the original Subscriptions email.
 	 *
-	 * @param WC_Order $order The order that is being paid.
+	 * @param \WC_Order $order The order that is being paid.
 	 */
 	public function trigger( $order ) {
 		if ( function_exists( 'wcs_order_contains_subscription' ) && ( wcs_order_contains_subscription( $order->get_id() ) || wcs_is_subscription( $order->get_id() ) || wcs_order_contains_renewal( $order->get_id() ) ) ) {
@@ -105,7 +108,7 @@ class WC_Stripe_Email_Failed_Renewal_Authentication extends WC_Stripe_Email_Fail
 			wcs_get_objects_property( $this->object, 'id' ) === $order_id &&
 			'' !== $rule_array['email_template_admin'] // Only send our email if a retry admin email was already going to be sent.
 		) {
-			$rule_array['email_template_admin'] = 'WC_Stripe_Email_Failed_Authentication_Retry';
+			$rule_array['email_template_admin'] = '\ElementorStripeEu\WC_Stripe_Email_Failed_Authentication_Retry';
 		}
 
 		return $rule_array;

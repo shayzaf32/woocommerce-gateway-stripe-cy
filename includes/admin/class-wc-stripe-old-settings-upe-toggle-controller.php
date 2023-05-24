@@ -46,17 +46,17 @@ class WC_Stripe_Old_Settings_UPE_Toggle_Controller {
 	 */
 	public function upe_toggle_script() {
 		// Webpack generates an assets file containing a dependencies array for our built JS file.
-		$script_asset_path = WC_STRIPE_PLUGIN_PATH . '/build/old_settings_upe_toggle.asset.php';
+		$script_asset_path = WC_STRIPE_EU_PLUGIN_PATH . '/build/old_settings_upe_toggle.asset.php';
 		$script_asset      = file_exists( $script_asset_path )
 			? require $script_asset_path
 			: [
 				'dependencies' => [],
-				'version'      => WC_STRIPE_VERSION,
+				'version'      => WC_STRIPE_EU_VERSION,
 			];
 
 		wp_register_script(
 			'woocommerce_stripe_old_settings_upe_toggle',
-			plugins_url( 'build/old_settings_upe_toggle.js', WC_STRIPE_MAIN_FILE ),
+			plugins_url( 'build/old_settings_upe_toggle.js', WC_STRIPE_EU_MAIN_FILE ),
 			$script_asset['dependencies'],
 			$script_asset['version'],
 			true

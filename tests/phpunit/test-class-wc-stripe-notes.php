@@ -1,4 +1,7 @@
 <?php
+
+use \ElementorStripeEu\WC_Stripe_UPE_StripeLink_Note;
+
 /**
  * Class WC_Stripe_Inbox_Notes_Test
  *
@@ -17,12 +20,12 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		// overriding the `WC_Stripe_Connect` in woocommerce_gateway_stripe(),
+		// overriding the `WC_Stripe_Connect` in woocommerce_gateway_stripe_eu(),
 		// because the method we're calling is static and we don't really have a way of injecting it all the way down to this class.
-		$this->stripe_connect_mock = $this->createPartialMock( WC_Stripe_Connect::class, [ 'is_connected' ] );
+		$this->stripe_connect_mock = $this->createPartialMock( \ElementorStripeEu\WC_Stripe_Connect::class, [ 'is_connected' ] );
 		$this->stripe_connect_mock->expects( $this->any() )->method( 'is_connected' )->willReturn( true );
-		$this->stripe_connect_original        = woocommerce_gateway_stripe()->connect;
-		woocommerce_gateway_stripe()->connect = $this->stripe_connect_mock;
+		$this->stripe_connect_original           = woocommerce_gateway_stripe_eu()->connect;
+		woocommerce_gateway_stripe_eu()->connect = $this->stripe_connect_mock;
 
 		if ( version_compare( WC_VERSION, '4.4.0', '<' ) ) {
 			$this->markTestSkipped( 'The used WC components are not backward compatible' );
@@ -31,7 +34,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 		update_option( '_wcstripe_feature_upe', 'yes' );
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'no',
@@ -40,9 +43,9 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		woocommerce_gateway_stripe()->connect = $this->stripe_connect_original;
+		woocommerce_gateway_stripe_eu()->connect = $this->stripe_connect_original;
 		delete_option( '_wcstripe_feature_upe' );
-		delete_option( 'woocommerce_stripe_settings' );
+		delete_option( 'woocommerce_stripe_eu_settings' );
 
 		parent::tear_down();
 	}
@@ -56,13 +59,13 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_stripelink_note() {
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
 			]
 		);
-		WC_Stripe::get_instance()->account = $this->getMockBuilder( 'WC_Stripe_Account' )
+		WC_Stripe::get_instance()->account = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Account' )
 			->disableOriginalConstructor()
 			->setMethods(
 				[
@@ -87,13 +90,13 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_notes_does_not_create_availability_note_when_upe_is_enbled() {
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
 			]
 		);
-		WC_Stripe::get_instance()->account = $this->getMockBuilder( 'WC_Stripe_Account' )
+		WC_Stripe::get_instance()->account = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Account' )
 			->disableOriginalConstructor()
 			->setMethods(
 				[
@@ -111,7 +114,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_notes_does_not_create_note_when_stripe_is_disabled() {
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'no',
 				'upe_checkout_experience_enabled' => 'no',
@@ -127,7 +130,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_notes_does_not_create_note_when_upe_has_been_manually_disabled() {
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'disabled',
@@ -143,7 +146,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_stripelink_note_unavailable_if_cc_not_enabled() {
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
@@ -159,7 +162,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_stripelink_note_unavailable_link_enabled() {
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
@@ -170,9 +173,9 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 		$this->set_enabled_payment_methods( [ 'card', 'link' ] );
 
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			array_merge(
-				get_option( 'woocommerce_stripe_settings' ),
+				get_option( 'woocommerce_stripe_eu_settings' ),
 				[
 					'upe_checkout_experience_accepted_payments' => [ 'card', 'link' ],
 				]
@@ -186,9 +189,9 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	private function set_enabled_payment_methods( $payment_methods ) {
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			array_merge(
-				get_option( 'woocommerce_stripe_settings' ),
+				get_option( 'woocommerce_stripe_eu_settings' ),
 				[
 					'upe_checkout_experience_accepted_payments' => $payment_methods,
 				]

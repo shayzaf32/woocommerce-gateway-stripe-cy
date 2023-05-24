@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class WC_REST_Stripe_Connection_Tokens_Controller
  */
@@ -15,21 +18,21 @@ class WC_REST_Stripe_Connection_Tokens_Controller extends WC_Stripe_REST_Base_Co
 	 *
 	 * @var string
 	 */
-	protected $rest_base = 'wc_stripe/connection_tokens';
+	protected $rest_base = 'wc_stripe_eu/connection_tokens';
 
 	/**
 	 * Stripe payment gateway.
 	 *
-	 * @var WC_Gateway_Stripe
+	 * @var WC_Gateway_Stripe_Eu
 	 */
 	private $gateway;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param WC_Gateway_Stripe $gateway Stripe payment gateway.
+	 * @param WC_Gateway_Stripe_Eu $gateway Stripe payment gateway.
 	 */
-	public function __construct( WC_Gateway_Stripe $gateway ) {
+	public function __construct( WC_Gateway_Stripe_Eu $gateway ) {
 		$this->gateway = $gateway;
 	}
 
@@ -41,7 +44,7 @@ class WC_REST_Stripe_Connection_Tokens_Controller extends WC_Stripe_REST_Base_Co
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::CREATABLE,
+				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_token' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -51,13 +54,13 @@ class WC_REST_Stripe_Connection_Tokens_Controller extends WC_Stripe_REST_Base_Co
 	/**
 	 * Create a connection token via API.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
 	public function create_token( $request ) {
 		$response = WC_Stripe_API::request( [], 'terminal/connection_tokens' );
 
 		if ( ! isset( $response->secret ) ) {
-			return rest_ensure_response( new WP_Error( 'wc_stripe_no_token', __( 'Stripe API did not return a connection token.', 'woocommerce-gateway-stripe' ) ) );
+			return rest_ensure_response( new \WP_Error( 'wc_stripe_no_token', __( 'Stripe API did not return a connection token.', 'woocommerce-gateway-stripe' ) ) );
 		}
 
 		$response->test_mode = $this->gateway->is_in_test_mode();

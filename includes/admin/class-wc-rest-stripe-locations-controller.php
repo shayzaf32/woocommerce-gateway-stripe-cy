@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class WC_REST_Stripe_Locations_Controller
  */
@@ -15,7 +18,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 	 *
 	 * @var string
 	 */
-	protected $rest_base = 'wc_stripe/terminal/locations';
+	protected $rest_base = 'wc_stripe_eu/terminal/locations';
 
 	/**
 	 * Configure REST API routes.
@@ -25,7 +28,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::CREATABLE,
+				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_location' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 				'args'                => [
@@ -44,7 +47,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_all_locations' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 				'args'                => [
@@ -67,7 +70,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			$this->namespace,
 			'/' . $this->rest_base . '/store',
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_store_location' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -76,7 +79,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<location_id>\w+)',
 			[
-				'methods'             => WP_REST_Server::DELETABLE,
+				'methods'             => \WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_location' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -85,7 +88,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<location_id>\w+)',
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_location' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -94,7 +97,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<location_id>\w+)',
 			[
-				'methods'             => WP_REST_Server::CREATABLE,
+				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'update_location' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 				'args'                => [
@@ -114,7 +117,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 	/**
 	 * Create a terminal location via Stripe API.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
 	public function create_location( $request ) {
 		try {
@@ -127,55 +130,55 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			);
 			return rest_ensure_response( $response );
 		} catch ( WC_Stripe_Exception $e ) {
-			return rest_ensure_response( new WP_Error( 'stripe_error', $e->getMessage() ) );
+			return rest_ensure_response( new \WP_Error( 'stripe_error', $e->getMessage() ) );
 		}
 	}
 
 	/**
 	 * Get all terminal locations via Stripe API.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
 	public function get_all_locations( $request ) {
 		try {
 			return rest_ensure_response( $this->fetch_locations() );
 		} catch ( WC_Stripe_Exception $e ) {
-			return rest_ensure_response( new WP_Error( 'stripe_error', $e->getMessage() ) );
+			return rest_ensure_response( new \WP_Error( 'stripe_error', $e->getMessage() ) );
 		}
 	}
 
 	/**
 	 * Delete a terminal location via Stripe API.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
 	public function delete_location( $request ) {
 		try {
 			$response = WC_Stripe_API::request( [], 'terminal/locations/' . urlencode( $request['location_id'] ), 'DELETE' );
 			return rest_ensure_response( $response );
 		} catch ( WC_Stripe_Exception $e ) {
-			return rest_ensure_response( new WP_Error( 'stripe_error', $e->getMessage() ) );
+			return rest_ensure_response( new \WP_Error( 'stripe_error', $e->getMessage() ) );
 		}
 	}
 
 	/**
 	 * Get a terminal location via Stripe API.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
 	public function get_location( $request ) {
 		try {
 			$response = WC_Stripe_API::request( [], 'terminal/locations/' . urlencode( $request['location_id'] ), 'GET' );
 			return rest_ensure_response( $response );
 		} catch ( WC_Stripe_Exception $e ) {
-			return rest_ensure_response( new WP_Error( 'stripe_error', $e->getMessage() ) );
+			return rest_ensure_response( new \WP_Error( 'stripe_error', $e->getMessage() ) );
 		}
 	}
 
 	/**
 	 * Get default terminal location.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
 	public function get_store_location( $request ) {
 		// Originally `get_bloginfo` was used for location name, later switched to `site_url` as the former may be blank.
@@ -197,7 +200,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 		$is_address_populated = isset( $address['country'], $address['city'], $address['postal_code'], $address['line1'] );
 		if ( ! $is_address_populated ) {
 			return rest_ensure_response(
-				new WP_Error(
+				new \WP_Error(
 					'store_address_is_incomplete',
 					admin_url(
 						add_query_arg(
@@ -232,14 +235,14 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			);
 			return rest_ensure_response( $response );
 		} catch ( WC_Stripe_Exception $e ) {
-			return rest_ensure_response( new WP_Error( 'stripe_error', $e->getMessage() ) );
+			return rest_ensure_response( new \WP_Error( 'stripe_error', $e->getMessage() ) );
 		}
 	}
 
 	/**
 	 * Update a terminal location via Stripe API.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
 	public function update_location( $request ) {
 		$body = [];
@@ -253,7 +256,7 @@ class WC_REST_Stripe_Locations_Controller extends WC_Stripe_REST_Base_Controller
 			$response = WC_Stripe_API::request( $body, 'terminal/locations/' . urlencode( $request['location_id'] ), 'POST' );
 			return rest_ensure_response( $response );
 		} catch ( WC_Stripe_Exception $e ) {
-			return rest_ensure_response( new WP_Error( 'stripe_error', $e->getMessage() ) );
+			return rest_ensure_response( new \WP_Error( 'stripe_error', $e->getMessage() ) );
 		}
 	}
 

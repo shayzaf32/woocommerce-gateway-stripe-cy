@@ -58,7 +58,7 @@ class WC_Stripe_Payment_Request_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->pr = new WC_Stripe_Payment_Request();
+		$this->pr = new \ElementorStripeEu\WC_Stripe_Payment_Request();
 
 		$this->simple_product = WC_Helper_Product::create_simple_product();
 

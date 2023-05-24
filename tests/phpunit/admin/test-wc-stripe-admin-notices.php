@@ -1,12 +1,15 @@
 <?php
 
+use \ElementorStripeEu\WC_Stripe_Helper;
+use \ElementorStripeEu\WC_Stripe_Admin_Notices;
+
 class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-stripe-admin-notices.php';
+		require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/admin/class-wc-stripe-admin-notices.php';
 
-		WC_Stripe::get_instance()->account = $this->getMockBuilder( 'WC_Stripe_Account' )
+		WC_Eu_Stripe::get_instance()->account = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Account' )
 				->disableOriginalConstructor()
 				->setMethods(
 					[
@@ -15,7 +18,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 				)
 				->getMock();
 
-		WC_Stripe::get_instance()->account->method( 'get_cached_account_data' )->willReturn(
+		WC_Eu_Stripe::get_instance()->account->method( 'get_cached_account_data' )->willReturn(
 			[
 				'test' => 'test',
 			]
@@ -23,7 +26,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 	}
 
 	public function test_no_notices_are_shown_when_user_is_not_admin() {
-		update_option( 'woocommerce_stripe_settings', [ 'enabled' => 'yes' ] );
+		update_option( 'woocommerce_stripe_eu_settings', [ 'enabled' => 'yes' ] );
 		$notices = new WC_Stripe_Admin_Notices();
 		ob_start();
 		$notices->admin_notices();
@@ -33,7 +36,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 
 	public function test_no_notices_are_shown_when_stripe_is_not_enabled() {
 		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
-		update_option( 'woocommerce_stripe_settings', [ 'enabled' => 'no' ] );
+		update_option( 'woocommerce_stripe_eu_settings', [ 'enabled' => 'no' ] );
 		$notices = new WC_Stripe_Admin_Notices();
 		ob_start();
 		$notices->admin_notices();
@@ -55,7 +58,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 		$notices = new WC_Stripe_Admin_Notices();
 		ob_start();
 		$notices->admin_notices();
-		if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_FUTURE_MIN_WC_VER ) ) {
+		if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_EU_FUTURE_MIN_WC_VER ) ) {
 			// Displaying the style notice results in an early return.
 			if ( ! in_array( 'style', $expected_notices, true ) ) {
 				// This means a version support notice will be added.
@@ -82,7 +85,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 		);
 		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'                         => 'yes',
 				'testmode'                        => 'no',
@@ -93,7 +96,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 		);
 
 		$stripe_settings = array_merge(
-			get_option( 'woocommerce_stripe_settings' ),
+			get_option( 'woocommerce_stripe_eu_settings' ),
 			[
 				'upe_checkout_experience_accepted_payments' => [
 					'giropay',
@@ -102,7 +105,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 				],
 			]
 		);
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
 		update_option( 'wc_stripe_show_style_notice', 'no' );
 		update_option( 'home', 'https://...' );
@@ -112,7 +115,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 		ob_start();
 		$notices->admin_notices();
 		ob_end_clean();
-		if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_FUTURE_MIN_WC_VER ) ) {
+		if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_EU_FUTURE_MIN_WC_VER ) ) {
 			$this->assertCount( 4, $notices->notices );
 			$this->assertArrayHasKey( 'wcver', $notices->notices );
 		} else {
@@ -125,7 +128,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 
 	public function test_invalid_keys_notice_is_shown_when_account_data_is_not_valid() {
 		// We need to re-create the mock object to override the mocked 'get_cached_account_data' function.
-		WC_Stripe::get_instance()->account = $this->getMockBuilder( 'WC_Stripe_Account' )
+		WC_Stripe::get_instance()->account = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Account' )
 			->disableOriginalConstructor()
 			->setMethods(
 				[
@@ -133,11 +136,11 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 				]
 			)
 			->getMock();
-		WC_Stripe::get_instance()->account->method( 'get_cached_account_data' )->willReturn( null );
+		WC_Eu_Stripe::get_instance()->account->method( 'get_cached_account_data' )->willReturn( null );
 
 		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
 		update_option(
-			'woocommerce_stripe_settings',
+			'woocommerce_stripe_eu_settings',
 			[
 				'enabled'         => 'yes',
 				'testmode'        => 'no',
@@ -154,7 +157,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 		$notices->admin_notices();
 		ob_end_clean();
 
-		if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_FUTURE_MIN_WC_VER ) ) {
+		if ( WC_Stripe_Helper::is_wc_lt( WC_STRIPE_EU_FUTURE_MIN_WC_VER ) ) {
 			$this->assertCount( 2, $notices->notices );
 			$this->assertArrayHasKey( 'wcver', $notices->notices );
 		} else {
@@ -169,7 +172,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 		return [
 			[
 				[
-					'woocommerce_stripe_settings' => [ 'enabled' => 'yes' ],
+					'woocommerce_stripe_eu_settings' => [ 'enabled' => 'yes' ],
 				],
 				[
 					'style',
@@ -177,7 +180,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'        => 'yes',
 						'three_d_secure' => 'yes',
 					],
@@ -189,7 +192,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'        => 'yes',
 						'three_d_secure' => 'yes',
 					],
@@ -201,7 +204,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'         => 'yes',
 						'three_d_secure'  => 'yes',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -217,12 +220,12 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 				false,
 				[
 					'page'    => 'wc-settings',
-					'section' => 'stripe',
+					'section' => 'stripe_eu',
 				],
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled' => 'yes',
 					],
 					'wc_stripe_show_style_notice' => 'no',
@@ -236,7 +239,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings'    => [
+					'woocommerce_stripe_eu_settings'    => [
 						'enabled'         => 'yes',
 						'publishable_key' => 'pk_live_valid_test_key',
 						'secret_key'      => 'sk_live_valid_test_key',
@@ -250,12 +253,12 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 				false,
 				[
 					'page'    => 'wc-settings',
-					'section' => 'stripe',
+					'section' => 'stripe_eu',
 				],
 			],
 			[
 				[
-					'woocommerce_stripe_settings'    => [
+					'woocommerce_stripe_eu_settings'    => [
 						'enabled' => 'yes',
 					],
 					'wc_stripe_show_style_notice'    => 'no',
@@ -274,7 +277,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'              => 'yes',
 						'testmode'             => 'yes',
 						'test_publishable_key' => 'invalid test key',
@@ -291,7 +294,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'              => 'yes',
 						'testmode'             => 'yes',
 						'test_publishable_key' => 'pk_test_valid_test_key',
@@ -304,7 +307,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'invalid live key',
@@ -321,7 +324,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -334,7 +337,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -349,7 +352,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -364,7 +367,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings'        => [
+					'woocommerce_stripe_eu_settings'        => [
 						'enabled'        => 'yes',
 						'testmode'       => 'no',
 						'three_d_secure' => 'yes',
@@ -383,7 +386,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings'        => [
+					'woocommerce_stripe_eu_settings'        => [
 						'enabled'  => 'yes',
 						'testmode' => 'no',
 					],
@@ -400,7 +403,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings'        => [
+					'woocommerce_stripe_eu_settings'        => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -417,7 +420,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings'        => [
+					'woocommerce_stripe_eu_settings'        => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -434,7 +437,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings'        => [
+					'woocommerce_stripe_eu_settings'        => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -451,7 +454,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings' => [
+					'woocommerce_stripe_eu_settings' => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',
@@ -464,7 +467,7 @@ class WC_Stripe_Admin_Notices_Test extends WP_UnitTestCase {
 			],
 			[
 				[
-					'woocommerce_stripe_settings'         => [
+					'woocommerce_stripe_eu_settings'         => [
 						'enabled'         => 'yes',
 						'testmode'        => 'no',
 						'publishable_key' => 'pk_live_valid_test_key',

@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -8,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Abstract class that will be inherited by voucher payment methods.
  * Used by Boleto and OXXO
  *
- * @extends WC_Gateway_Stripe
+ * @extends WC_Gateway_Stripe_Eu
  *
  * @since 5.8.0
  */
@@ -120,7 +123,7 @@ abstract class WC_Stripe_Payment_Gateway_Voucher extends WC_Stripe_Payment_Gatew
 		// Load the settings.
 		$this->init_settings();
 
-		$main_settings              = get_option( 'woocommerce_stripe_settings' );
+		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->title                = $this->get_option( 'title' );
 		$this->description          = $this->get_option( 'description' );
 		$this->enabled              = $this->get_option( 'enabled' );
@@ -220,7 +223,7 @@ abstract class WC_Stripe_Payment_Gateway_Voucher extends WC_Stripe_Payment_Gatew
 	 * @since 5.8.0
 	 */
 	public function init_form_fields() {
-		$this->form_fields = require WC_STRIPE_PLUGIN_PATH . '/includes/admin/stripe-' . $this->stripe_id . '-settings.php';
+		$this->form_fields = require WC_STRIPE_EU_PLUGIN_PATH . '/includes/admin/stripe-' . $this->stripe_id . '-settings.php';
 	}
 
 	/**
@@ -261,7 +264,7 @@ abstract class WC_Stripe_Payment_Gateway_Voucher extends WC_Stripe_Payment_Gatew
 			];
 		} catch ( WC_Stripe_Exception $e ) {
 			wc_add_notice( $e->getLocalizedMessage(), 'error' );
-			WC_Stripe_Logger::log( 'Error: ' . $e->getMessage() );
+			\ElementorStripeEu\WC_Stripe_Logger::log( 'Error: ' . $e->getMessage() );
 
 			do_action( 'wc_gateway_stripe_process_payment_error', $e, $order );
 
@@ -323,7 +326,7 @@ abstract class WC_Stripe_Payment_Gateway_Voucher extends WC_Stripe_Payment_Gatew
 		);
 
 		if ( ! empty( $payment_intent->error ) ) {
-			throw new Exception( $payment_intent->error->message );
+			throw new \Exception( $payment_intent->error->message );
 		}
 
 		return $payment_intent;

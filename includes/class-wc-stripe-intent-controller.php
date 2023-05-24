@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -13,7 +16,7 @@ class WC_Stripe_Intent_Controller {
 	 * Holds an instance of the gateway class.
 	 *
 	 * @since 4.2.0
-	 * @var WC_Gateway_Stripe
+	 * @var WC_Gateway_Stripe_Eu
 	 */
 	protected $gateway;
 
@@ -50,7 +53,7 @@ class WC_Stripe_Intent_Controller {
 	protected function get_gateway() {
 		if ( ! isset( $this->gateway ) ) {
 			$gateways      = WC()->payment_gateways()->payment_gateways();
-			$this->gateway = $gateways[ WC_Gateway_Stripe::ID ];
+			$this->gateway = $gateways[ WC_Gateway_Stripe_Eu::ID ];
 		}
 
 		return $this->gateway;
@@ -77,7 +80,7 @@ class WC_Stripe_Intent_Controller {
 	 *
 	 * @since 4.2.0
 	 * @throws WC_Stripe_Exception An exception if there is no order ID or the order does not exist.
-	 * @return WC_Order
+	 * @return \WC_Order
 	 */
 	protected function get_order_from_request() {
 		if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['nonce'] ), 'wc_stripe_confirm_pi' ) ) {
@@ -133,7 +136,7 @@ class WC_Stripe_Intent_Controller {
 					// Currently, Stripe saves the payment method even if the authentication fails for 3DS cards.
 					// Although, the card is not stored in DB we need to remove the source from the customer on Stripe
 					// in order to keep the sources in sync with the data in DB.
-					$customer = new WC_Stripe_Customer( wp_get_current_user()->ID );
+					$customer = new \ElementorStripeEu\WC_Stripe_Customer( wp_get_current_user()->ID );
 					$customer->delete_source( $intent->last_payment_error->source->id );
 				} else {
 					$metadata = $intent->metadata;
@@ -203,20 +206,20 @@ class WC_Stripe_Intent_Controller {
 				! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wc_stripe_create_si' )
 				|| ! ( 0 === strpos( $source_id, 'src_' ) || 0 === strpos( $source_id, 'pm_' ) )
 			) {
-				throw new Exception( __( 'Unable to verify your request. Please reload the page and try again.', 'woocommerce-gateway-stripe' ) );
+				throw new \Exception( __( 'Unable to verify your request. Please reload the page and try again.', 'woocommerce-gateway-stripe' ) );
 			}
 
 			// 2. Load the customer ID (and create a customer eventually).
-			$customer = new WC_Stripe_Customer( wp_get_current_user()->ID );
+			$customer = new \ElementorStripeEu\WC_Stripe_Customer( wp_get_current_user()->ID );
 
 			// 3. Attach the source to the customer (Setup Intents require that).
 			$source_object = $customer->attach_source( $source_id );
 
 			if ( ! empty( $source_object->error ) ) {
-				throw new Exception( $source_object->error->message );
+				throw new \Exception( $source_object->error->message );
 			}
 			if ( is_wp_error( $source_object ) ) {
-				throw new Exception( $source_object->get_error_message() );
+				throw new \Exception( $source_object->get_error_message() );
 			}
 
 			// SEPA Direct Debit payments do not require any customer action after the source has been created.
@@ -243,7 +246,7 @@ class WC_Stripe_Intent_Controller {
 				$error_response_message = print_r( $setup_intent, true );
 				WC_Stripe_Logger::log( 'Failed create Setup Intent while saving a card.' );
 				WC_Stripe_Logger::log( "Response: $error_response_message" );
-				throw new Exception( __( 'Your card could not be set up for future usage.', 'woocommerce-gateway-stripe' ) );
+				throw new \Exception( __( 'Your card could not be set up for future usage.', 'woocommerce-gateway-stripe' ) );
 			}
 
 			// 5. Respond.
@@ -270,7 +273,7 @@ class WC_Stripe_Intent_Controller {
 					'status' => 'success',
 				];
 			}
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			$response = [
 				'status' => 'error',
 				'error'  => [
@@ -291,14 +294,14 @@ class WC_Stripe_Intent_Controller {
 		try {
 			$is_nonce_valid = check_ajax_referer( 'wc_stripe_create_payment_intent_nonce', false, false );
 			if ( ! $is_nonce_valid ) {
-				throw new Exception( __( "We're not able to process this payment. Please refresh the page and try again.", 'woocommerce-gateway-stripe' ) );
+				throw new \Exception( __( "We're not able to process this payment. Please refresh the page and try again.", 'woocommerce-gateway-stripe' ) );
 			}
 
 			// If paying from order, we need to get the total from the order instead of the cart.
 			$order_id = isset( $_POST['stripe_order_id'] ) ? absint( $_POST['stripe_order_id'] ) : null;
 
 			wp_send_json_success( $this->create_payment_intent( $order_id ), 200 );
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			WC_Stripe_Logger::log( 'Create payment intent error: ' . $e->getMessage() );
 			// Send back error so it can be displayed to the customer.
 			wp_send_json_error(
@@ -315,7 +318,7 @@ class WC_Stripe_Intent_Controller {
 	 * Creates payment intent using current cart or order and store details.
 	 *
 	 * @param {int} $order_id The id of the order if intent created from Order.
-	 * @throws Exception - If the create intent call returns with an error.
+	 * @throws \Exception - If the create intent call returns with an error.
 	 * @return array
 	 */
 	public function create_payment_intent( $order_id = null ) {
@@ -341,7 +344,7 @@ class WC_Stripe_Intent_Controller {
 		);
 
 		if ( ! empty( $payment_intent->error ) ) {
-			throw new Exception( $payment_intent->error->message );
+			throw new \Exception( $payment_intent->error->message );
 		}
 
 		return [
@@ -359,7 +362,7 @@ class WC_Stripe_Intent_Controller {
 		try {
 			$is_nonce_valid = check_ajax_referer( 'wc_stripe_update_payment_intent_nonce', false, false );
 			if ( ! $is_nonce_valid ) {
-				throw new Exception( __( "We're not able to process this payment. Please refresh the page and try again.", 'woocommerce-gateway-stripe' ) );
+				throw new \Exception( __( "We're not able to process this payment. Please refresh the page and try again.", 'woocommerce-gateway-stripe' ) );
 			}
 
 			$order_id                  = isset( $_POST['stripe_order_id'] ) ? absint( $_POST['stripe_order_id'] ) : null;
@@ -368,7 +371,7 @@ class WC_Stripe_Intent_Controller {
 			$selected_upe_payment_type = ! empty( $_POST['selected_upe_payment_type'] ) ? wc_clean( wp_unslash( $_POST['selected_upe_payment_type'] ) ) : '';
 
 			wp_send_json_success( $this->update_payment_intent( $payment_intent_id, $order_id, $save_payment_method, $selected_upe_payment_type ), 200 );
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			// Send back error so it can be displayed to the customer.
 			wp_send_json_error(
 				[
@@ -390,7 +393,7 @@ class WC_Stripe_Intent_Controller {
 	 * @param {boolean} $save_payment_method       True if saving the payment method.
 	 * @param {string}  $selected_upe_payment_type The name of the selected UPE payment type or empty string.
 	 *
-	 * @throws Exception  If the update intent call returns with an error.
+	 * @throws \Exception  If the update intent call returns with an error.
 	 * @return array|null An array with result of the update, or nothing
 	 */
 	public function update_payment_intent( $payment_intent_id = '', $order_id = null, $save_payment_method = false, $selected_upe_payment_type = '' ) {
@@ -403,7 +406,7 @@ class WC_Stripe_Intent_Controller {
 		$gateway  = $this->get_upe_gateway();
 		$amount   = $order->get_total();
 		$currency = $order->get_currency();
-		$customer = new WC_Stripe_Customer( wp_get_current_user()->ID );
+		$customer = new \ElementorStripeEu\WC_Stripe_Customer( wp_get_current_user()->ID );
 
 		if ( $payment_intent_id ) {
 
@@ -469,11 +472,11 @@ class WC_Stripe_Intent_Controller {
 		try {
 			$is_nonce_valid = check_ajax_referer( 'wc_stripe_create_setup_intent_nonce', false, false );
 			if ( ! $is_nonce_valid ) {
-				throw new Exception( __( "We're not able to add this payment method. Please refresh the page and try again.", 'woocommerce-gateway-stripe' ) );
+				throw new \Exception( __( "We're not able to add this payment method. Please refresh the page and try again.", 'woocommerce-gateway-stripe' ) );
 			}
 
 			wp_send_json_success( $this->init_setup_intent(), 200 );
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			// Send back error, so it can be displayed to the customer.
 			wp_send_json_error(
 				[
@@ -496,10 +499,10 @@ class WC_Stripe_Intent_Controller {
 	public function init_setup_intent() {
 		// Determine the customer managing the payment methods, create one if we don't have one already.
 		$user        = wp_get_current_user();
-		$customer    = new WC_Stripe_Customer( $user->ID );
+		$customer    = new \ElementorStripeEu\WC_Stripe_Customer( $user->ID );
 		$customer_id = $customer->get_id();
 		if ( empty( $customer_id ) ) {
-			$customer_data = WC_Stripe_Customer::map_customer_data( null, new WC_Customer( $user->ID ) );
+			$customer_data = \ElementorStripeEu\WC_Stripe_Customer::map_customer_data( null, new WC_Customer( $user->ID ) );
 			$customer_id   = $customer->create_customer( $customer_data );
 		}
 
@@ -516,7 +519,7 @@ class WC_Stripe_Intent_Controller {
 		);
 
 		if ( ! empty( $setup_intent->error ) ) {
-			throw new Exception( $setup_intent->error->message );
+			throw new \Exception( $setup_intent->error->message );
 		}
 
 		return [
@@ -528,13 +531,13 @@ class WC_Stripe_Intent_Controller {
 	/**
 	 * Handle AJAX request for saving UPE appearance value to transient.
 	 *
-	 * @throws Exception - If nonce or setup intent is invalid.
+	 * @throws \Exception - If nonce or setup intent is invalid.
 	 */
 	public function save_upe_appearance_ajax() {
 		try {
 			$is_nonce_valid = check_ajax_referer( 'wc_stripe_save_upe_appearance_nonce', false, false );
 			if ( ! $is_nonce_valid ) {
-				throw new Exception(
+				throw new \Exception(
 					__( 'Unable to update UPE appearance values at this time.', 'woocommerce-gateway-stripe' )
 				);
 			}
@@ -548,7 +551,7 @@ class WC_Stripe_Intent_Controller {
 				set_transient( $appearance_transient, $appearance, DAY_IN_SECONDS );
 			}
 			wp_send_json_success( $appearance, 200 );
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			// Send back error so it can be displayed to the customer.
 			wp_send_json_error(
 				[

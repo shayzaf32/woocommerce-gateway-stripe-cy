@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -14,7 +17,7 @@ class WC_Stripe_UPE_Payment_Method_CC extends WC_Stripe_UPE_Payment_Method {
 
 	const STRIPE_ID = 'card';
 
-	const LPM_GATEWAY_CLASS = WC_Gateway_Stripe::class;
+	const LPM_GATEWAY_CLASS = WC_Gateway_Stripe_Eu::class;
 
 	/**
 	 * Constructor for card payment method

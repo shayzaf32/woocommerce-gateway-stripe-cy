@@ -1,6 +1,6 @@
 {
-  "name": "woocommerce-gateway-stripe",
-  "title": "WooCommerce Gateway Stripe",
+  "name": "woocommerce-gateway-stripe-eu",
+  "title": "WooCommerce Gateway EU Stripe",
   "version": "7.4.0",
   "license": "GPL-3.0",
   "homepage": "http://wordpress.org/plugins/woocommerce-gateway-stripe/",
@@ -154,7 +154,7 @@
     "npm": ">=8.15.0"
   },
   "config": {
-    "wp_org_slug": "woocommerce-gateway-stripe",
+    "wp_org_slug": "woocommerce-gateway-stripe-eu",
     "version_replace_paths": [
       "includes",
       "templates",

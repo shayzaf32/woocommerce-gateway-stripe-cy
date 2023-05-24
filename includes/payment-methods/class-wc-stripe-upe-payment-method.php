@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -85,7 +88,7 @@ abstract class WC_Stripe_UPE_Payment_Method {
 	 * Create instance of payment method
 	 */
 	public function __construct() {
-		$main_settings = get_option( 'woocommerce_stripe_settings' );
+		$main_settings = get_option( 'woocommerce_stripe_eu_settings' );
 
 		if ( isset( $main_settings['upe_checkout_experience_accepted_payments'] ) ) {
 			$enabled_upe_methods = $main_settings['upe_checkout_experience_accepted_payments'];
@@ -217,7 +220,7 @@ abstract class WC_Stripe_UPE_Payment_Method {
 	 */
 	public function is_capability_active() {
 		// Treat all capabilities as active when in test mode.
-		$plugin_settings   = get_option( 'woocommerce_stripe_settings' );
+		$plugin_settings   = get_option( 'woocommerce_stripe_eu_settings' );
 		$test_mode_setting = ! empty( $plugin_settings['testmode'] ) ? $plugin_settings['testmode'] : 'no';
 
 		if ( 'yes' === $test_mode_setting ) {
@@ -239,7 +242,7 @@ abstract class WC_Stripe_UPE_Payment_Method {
 	 * @return object
 	 */
 	public function get_capabilities_response() {
-		$account = WC_Stripe::get_instance()->account;
+		$account = WC_Eu_Stripe::get_instance()->account;
 		$data    = $account->get_cached_account_data();
 		if ( empty( $data ) || ! isset( $data['capabilities'] ) ) {
 			return [];

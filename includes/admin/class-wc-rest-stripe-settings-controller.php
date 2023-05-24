@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class WC_REST_Stripe_Settings_Controller
  */
@@ -15,21 +18,21 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	 *
 	 * @var string
 	 */
-	protected $rest_base = 'wc_stripe/settings';
+	protected $rest_base = 'wc_stripe_eu/settings';
 
 	/**
 	 * Stripe payment gateway.
 	 *
-	 * @var WC_Gateway_Stripe
+	 * @var WC_Gateway_Stripe_Eu
 	 */
 	private $gateway;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param WC_Gateway_Stripe $gateway Stripe payment gateway.
+	 * @param WC_Gateway_Stripe_Eu $gateway Stripe payment gateway.
 	 */
-	public function __construct( WC_Gateway_Stripe $gateway ) {
+	public function __construct( WC_Gateway_Stripe_Eu $gateway ) {
 		$this->gateway = $gateway;
 	}
 
@@ -43,7 +46,7 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_settings' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -52,7 +55,7 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::EDITABLE,
+				'methods'             => \WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'update_settings' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 				'args'                => [
@@ -167,9 +170,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	 * Validate the regular statement descriptor.
 	 *
 	 * @param mixed           $value The value being validated.
-	 * @param WP_REST_Request $request The request made.
+	 * @param \WP_REST_Request $request The request made.
 	 * @param string          $param The parameter name, used in error messages.
-	 * @return true|WP_Error
+	 * @return true|\WP_Error
 	 */
 	public function validate_regular_statement_descriptor( $value, $request, $param ) {
 		return $this->validate_statement_descriptor( $value, $request, $param, 22 );
@@ -179,9 +182,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	 * Validate the short statement descriptor.
 	 *
 	 * @param mixed           $value The value being validated.
-	 * @param WP_REST_Request $request The request made.
+	 * @param \WP_REST_Request $request The request made.
 	 * @param string          $param The parameter name, used in error messages.
-	 * @return true|WP_Error
+	 * @return true|\WP_Error
 	 */
 	public function validate_short_statement_descriptor( $value, $request, $param ) {
 		$is_short_account_statement_enabled = $request->get_param( 'is_short_statement_descriptor_enabled' );
@@ -200,10 +203,10 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	 * @since 4.7.0
 	 *
 	 * @param mixed           $value The value being validated.
-	 * @param WP_REST_Request $request The request made.
+	 * @param \WP_REST_Request $request The request made.
 	 * @param string          $param The parameter name, used in error messages.
 	 * @param int             $max_length Maximum statement length.
-	 * @return true|WP_Error
+	 * @return true|\WP_Error
 	 */
 	public function validate_statement_descriptor( $value, $request, $param, $max_length ) {
 		$string_validation_result = rest_validate_request_arg( $value, $request, $param );
@@ -219,8 +222,8 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 
 		try {
 			$this->gateway->validate_account_statement_descriptor_field( $param, $value, $max_length );
-		} catch ( Exception $exception ) {
-			return new WP_Error(
+		} catch ( \Exception $exception ) {
+			return new \WP_Error(
 				'rest_invalid_pattern',
 				$exception->getMessage()
 			);
@@ -232,10 +235,10 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Retrieve settings.
 	 *
-	 * @return WP_REST_Response
+	 * @return \WP_REST_Response
 	 */
 	public function get_settings() {
-		return new WP_REST_Response(
+		return new \WP_REST_Response(
 			[
 				/* Settings > General */
 				'is_stripe_enabled'                     => $this->gateway->is_enabled(),
@@ -273,9 +276,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Update settings.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
-	public function update_settings( WP_REST_Request $request ) {
+	public function update_settings( \WP_REST_Request $request ) {
 		/* Settings > General */
 		$this->update_is_stripe_enabled( $request );
 		$this->update_title( $request );
@@ -302,15 +305,15 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 		$this->update_is_debug_log_enabled( $request );
 		$this->update_is_upe_enabled( $request );
 
-		return new WP_REST_Response( [], 200 );
+		return new \WP_REST_Response( [], 200 );
 	}
 
 	/**
 	 * Updates Stripe enabled status.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_stripe_enabled( WP_REST_Request $request ) {
+	private function update_is_stripe_enabled( \WP_REST_Request $request ) {
 		$is_stripe_enabled = $request->get_param( 'is_stripe_enabled' );
 
 		if ( null === $is_stripe_enabled ) {
@@ -327,9 +330,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates title.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_title( WP_REST_Request $request ) {
+	private function update_title( \WP_REST_Request $request ) {
 		$title = $request->get_param( 'title' );
 
 		if ( null === $title ) {
@@ -342,9 +345,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates UPE title.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_title_upe( WP_REST_Request $request ) {
+	private function update_title_upe( \WP_REST_Request $request ) {
 		$title_upe = $request->get_param( 'title_upe' );
 
 		if ( null === $title_upe ) {
@@ -357,9 +360,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates description.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_description( WP_REST_Request $request ) {
+	private function update_description( \WP_REST_Request $request ) {
 		$description = $request->get_param( 'description' );
 
 		if ( null === $description ) {
@@ -372,9 +375,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates Stripe test mode.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_test_mode_enabled( WP_REST_Request $request ) {
+	private function update_is_test_mode_enabled( \WP_REST_Request $request ) {
 		$is_test_mode_enabled = $request->get_param( 'is_test_mode_enabled' );
 
 		if ( null === $is_test_mode_enabled ) {
@@ -387,9 +390,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates the "payment request" enable/disable settings.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_payment_request_enabled( WP_REST_Request $request ) {
+	private function update_is_payment_request_enabled( \WP_REST_Request $request ) {
 		$is_payment_request_enabled = $request->get_param( 'is_payment_request_enabled' );
 
 		if ( null === $is_payment_request_enabled ) {
@@ -402,9 +405,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates manual capture.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_manual_capture_enabled( WP_REST_Request $request ) {
+	private function update_is_manual_capture_enabled( \WP_REST_Request $request ) {
 		$is_manual_capture_enabled = $request->get_param( 'is_manual_capture_enabled' );
 
 		if ( null === $is_manual_capture_enabled ) {
@@ -417,9 +420,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates "saved cards" feature.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_saved_cards_enabled( WP_REST_Request $request ) {
+	private function update_is_saved_cards_enabled( \WP_REST_Request $request ) {
 		$is_saved_cards_enabled = $request->get_param( 'is_saved_cards_enabled' );
 
 		if ( null === $is_saved_cards_enabled ) {
@@ -432,9 +435,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates "saved cards" feature.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_separate_card_form_enabled( WP_REST_Request $request ) {
+	private function update_is_separate_card_form_enabled( \WP_REST_Request $request ) {
 		$is_separate_card_form_enabled = $request->get_param( 'is_separate_card_form_enabled' );
 
 		if ( null === $is_separate_card_form_enabled ) {
@@ -447,9 +450,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates account statement descriptor.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_account_statement_descriptor( WP_REST_Request $request ) {
+	private function update_account_statement_descriptor( \WP_REST_Request $request ) {
 		$account_statement_descriptor = $request->get_param( 'statement_descriptor' );
 
 		if ( null === $account_statement_descriptor ) {
@@ -462,9 +465,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates whether short account statement should be used.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_short_account_statement_enabled( WP_REST_Request $request ) {
+	private function update_is_short_account_statement_enabled( \WP_REST_Request $request ) {
 		$is_short_account_statement_enabled = $request->get_param( 'is_short_statement_descriptor_enabled' );
 
 		if ( null === $is_short_account_statement_enabled ) {
@@ -477,9 +480,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates short account statement descriptor.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_short_account_statement_descriptor( WP_REST_Request $request ) {
+	private function update_short_account_statement_descriptor( \WP_REST_Request $request ) {
 		$is_short_account_statement_enabled = $request->get_param( 'is_short_statement_descriptor_enabled' );
 		$short_account_statement_descriptor = $request->get_param( 'short_statement_descriptor' );
 
@@ -498,9 +501,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates whether debug logging is enabled.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_debug_log_enabled( WP_REST_Request $request ) {
+	private function update_is_debug_log_enabled( \WP_REST_Request $request ) {
 		$is_debug_log_enabled = $request->get_param( 'is_debug_log_enabled' );
 
 		if ( null === $is_debug_log_enabled ) {
@@ -514,25 +517,25 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates whether debug logging is enabled.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_is_upe_enabled( WP_REST_Request $request ) {
+	private function update_is_upe_enabled( \WP_REST_Request $request ) {
 		$is_upe_enabled = $request->get_param( 'is_upe_enabled' );
 
 		if ( null === $is_upe_enabled ) {
 			return;
 		}
 
-		$settings = get_option( 'woocommerce_stripe_settings', [] );
+		$settings = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] = $is_upe_enabled ? 'yes' : 'disabled';
-		update_option( 'woocommerce_stripe_settings', $settings );
+		update_option( 'woocommerce_stripe_eu_settings', $settings );
 
 		// including the class again because otherwise it's not present.
-		if ( WC_Stripe_Inbox_Notes::are_inbox_notes_supported() ) {
-			require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
+		if ( \ElementorStripeEu\WC_Stripe_Inbox_Notes::are_inbox_notes_supported() ) {
+			require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
 			WC_Stripe_UPE_Availability_Note::possibly_delete_note();
 
-			require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-stripelink-note.php';
+			require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-stripelink-note.php';
 			WC_Stripe_UPE_StripeLink_Note::possibly_delete_note();
 		}
 	}
@@ -540,9 +543,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates appearance attributes of the payment request button.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_payment_request_settings( WP_REST_Request $request ) {
+	private function update_payment_request_settings( \WP_REST_Request $request ) {
 		$attributes = [
 			'payment_request_button_type'      => 'payment_request_button_type',
 			'payment_request_button_size'      => 'payment_request_button_size',
@@ -563,9 +566,9 @@ class WC_REST_Stripe_Settings_Controller extends WC_Stripe_REST_Base_Controller 
 	/**
 	 * Updates the list of enabled payment methods.
 	 *
-	 * @param WP_REST_Request $request Request object.
+	 * @param \WP_REST_Request $request Request object.
 	 */
-	private function update_enabled_payment_methods( WP_REST_Request $request ) {
+	private function update_enabled_payment_methods( \WP_REST_Request $request ) {
 		// no need to update the payment methods, if the UPE checkout is not enabled
 		if ( ! WC_Stripe_Feature_Flags::is_upe_checkout_enabled() ) {
 			return;

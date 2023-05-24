@@ -10,7 +10,7 @@
  */
 class WC_Stripe_UPE_Compatibility_Controller_Test extends WP_UnitTestCase {
 	/**
-	 * @var WC_Stripe_UPE_Compatibility_Controller
+	 * @var \ElementorStripeEu\WC_Stripe_UPE_Compatibility_Controller
 	 */
 	private $controller;
 
@@ -29,9 +29,9 @@ class WC_Stripe_UPE_Compatibility_Controller_Test extends WP_UnitTestCase {
 		global $wp_version;
 		$this->initial_wp_version = $wp_version;
 
-		require_once WC_STRIPE_PLUGIN_PATH . '/includes/admin/class-wc-stripe-upe-compatibility-controller.php';
+		require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/admin/class-wc-stripe-upe-compatibility-controller.php';
 
-		$this->controller = $this->getMockBuilder( WC_Stripe_UPE_Compatibility_Controller::class )
+		$this->controller = $this->getMockBuilder( \ElementorStripeEu\WC_Stripe_UPE_Compatibility_Controller::class )
 								 ->disableOriginalConstructor()
 								 ->setMethods( [ 'get_wc_version' ] )
 								 ->getMock();

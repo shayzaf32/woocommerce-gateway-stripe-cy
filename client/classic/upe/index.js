@@ -149,8 +149,8 @@ jQuery( function ( $ ) {
 			$( '.woocommerce-SavedPaymentMethods-saveNew' ).show();
 		} else {
 			$( '.woocommerce-SavedPaymentMethods-saveNew' ).hide();
-			$( 'input#wc-stripe-new-payment-method' ).prop( 'checked', false );
-			$( 'input#wc-stripe-new-payment-method' ).trigger( 'change' );
+			$( 'input#wc-stripe_eu-new-payment-method' ).prop( 'checked', false );
+			$( 'input#wc-stripe_eu-new-payment-method' ).trigger( 'change' );
 		}
 	};
 
@@ -410,7 +410,7 @@ jQuery( function ( $ ) {
 
 		try {
 			const isSavingPaymentMethod = $(
-				'#wc-stripe-new-payment-method'
+				'#wc-stripe_eu-new-payment-method'
 			).is( ':checked' );
 			const savePaymentMethod = isSavingPaymentMethod ? 'yes' : 'no';
 
@@ -552,7 +552,7 @@ jQuery( function ( $ ) {
 	const maybeShowAuthenticationModal = () => {
 		const paymentMethodId = $( '#wc-stripe-payment-method' ).val();
 
-		const savePaymentMethod = $( '#wc-stripe-new-payment-method' ).is(
+		const savePaymentMethod = $( '#wc-stripe_eu-new-payment-method' ).is(
 			':checked'
 		);
 		const confirmation = api.confirmIntent(
@@ -615,7 +615,8 @@ jQuery( function ( $ ) {
 	}
 
 	// Handle the checkout form when WooCommerce Gateway Stripe is chosen.
-	$( 'form.checkout' ).on( 'checkout_place_order_stripe', function () {
+	$( 'form.checkout' ).on( 'checkout_place_order_stripe_eu', function () {
+		console.log(" hereee4324232423");
 		if ( ! isUsingSavedPaymentMethod() ) {
 			if ( isUPEEnabled && paymentIntentId ) {
 				handleUPECheckout( $( this ) );
@@ -648,8 +649,8 @@ jQuery( function ( $ ) {
 
 	// Add terms parameter to UPE if save payment information checkbox is checked.
 	// This shows required legal mandates when customer elects to save payment method during checkout.
-	$( document ).on( 'change', '#wc-stripe-new-payment-method', () => {
-		const value = $( '#wc-stripe-new-payment-method' ).is( ':checked' )
+	$( document ).on( 'change', '#wc-stripe_eu-new-payment-method', () => {
+		const value = $( '#wc-stripe_eu-new-payment-method' ).is( ':checked' )
 			? 'always'
 			: 'never';
 		if ( isUPEEnabled && upeElement ) {

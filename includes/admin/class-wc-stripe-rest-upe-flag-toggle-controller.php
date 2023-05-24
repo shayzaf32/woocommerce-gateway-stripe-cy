@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class WC_Stripe_REST_UPE_Flag_Toggle_Controller
  */
@@ -24,7 +27,7 @@ class WC_Stripe_REST_UPE_Flag_Toggle_Controller extends WC_Stripe_REST_Base_Cont
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_flag' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -33,7 +36,7 @@ class WC_Stripe_REST_UPE_Flag_Toggle_Controller extends WC_Stripe_REST_Base_Cont
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::EDITABLE,
+				'methods'             => \WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'set_flag' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 				'args'                => [
@@ -50,10 +53,10 @@ class WC_Stripe_REST_UPE_Flag_Toggle_Controller extends WC_Stripe_REST_Base_Cont
 	/**
 	 * Retrieve flag status.
 	 *
-	 * @return WP_REST_Response
+	 * @return \WP_REST_Response
 	 */
 	public function get_flag() {
-		return new WP_REST_Response(
+		return new \WP_REST_Response(
 			[
 				'is_upe_enabled' => WC_Stripe_Feature_Flags::is_upe_checkout_enabled(),
 			]
@@ -63,29 +66,29 @@ class WC_Stripe_REST_UPE_Flag_Toggle_Controller extends WC_Stripe_REST_Base_Cont
 	/**
 	 * Update the data.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
-	public function set_flag( WP_REST_Request $request ) {
+	public function set_flag( \WP_REST_Request $request ) {
 		$is_upe_enabled = $request->get_param( 'is_upe_enabled' );
 
 		if ( null === $is_upe_enabled ) {
-			return new WP_REST_Response( [ 'result' => 'bad_request' ], 400 );
+			return new \WP_REST_Response( [ 'result' => 'bad_request' ], 400 );
 		}
 
-		$settings = get_option( 'woocommerce_stripe_settings', [] );
+		$settings = get_option( 'woocommerce_stripe_eu_settings', [] );
 		$settings[ WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] = $is_upe_enabled ? 'yes' : 'disabled';
 
-		update_option( 'woocommerce_stripe_settings', $settings );
+		update_option( 'woocommerce_stripe_eu_settings', $settings );
 
 		// including the class again because otherwise it's not present.
-		if ( WC_Stripe_Inbox_Notes::are_inbox_notes_supported() ) {
-			require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
+		if ( \ElementorStripeEu\WC_Stripe_Inbox_Notes::are_inbox_notes_supported() ) {
+			require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-availability-note.php';
 			WC_Stripe_UPE_Availability_Note::possibly_delete_note();
 
-			require_once WC_STRIPE_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-stripelink-note.php';
+			require_once WC_STRIPE_EU_PLUGIN_PATH . '/includes/notes/class-wc-stripe-upe-stripelink-note.php';
 			WC_Stripe_UPE_StripeLink_Note::possibly_delete_note();
 		}
 
-		return new WP_REST_Response( [ 'result' => 'success' ], 200 );
+		return new \WP_REST_Response( [ 'result' => 'success' ], 200 );
 	}
 }

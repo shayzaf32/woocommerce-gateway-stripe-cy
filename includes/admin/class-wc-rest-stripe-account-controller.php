@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 /**
  * Class WC_REST_Stripe_Account_Controller
  */
@@ -16,7 +19,7 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 	 *
 	 * @var string
 	 */
-	protected $rest_base = 'wc_stripe/account';
+	protected $rest_base = 'wc_stripe_eu/account';
 
 	/**
 	 * The account data utility.
@@ -28,11 +31,11 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 	/**
 	 * Stripe payment gateway.
 	 *
-	 * @var WC_Gateway_Stripe
+	 * @var WC_Gateway_Stripe_Eu
 	 */
 	private $gateway;
 
-	public function __construct( WC_Gateway_Stripe $gateway, WC_Stripe_Account $account ) {
+	public function __construct( WC_Gateway_Stripe_Eu $gateway, WC_Stripe_Account $account ) {
 		$this->gateway = $gateway;
 		$this->account = $account;
 	}
@@ -45,7 +48,7 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_account' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -55,7 +58,7 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/summary',
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_account_summary' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -65,7 +68,7 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/webhook-status-message',
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_webhook_status_message' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -75,7 +78,7 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/refresh',
 			[
-				'methods'             => WP_REST_Server::EDITABLE,
+				'methods'             => \WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'refresh_account' ],
 				'permission_callback' => [ $this, 'check_permission' ],
 			]
@@ -85,10 +88,10 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 	/**
 	 * Retrieve the Stripe account information.
 	 *
-	 * @return WP_REST_Response
+	 * @return \WP_REST_Response
 	 */
 	public function get_account() {
-		return new WP_REST_Response(
+		return new \WP_REST_Response(
 			[
 				'account'                => $this->account->get_cached_account_data(),
 				'testmode'               => WC_Stripe_Webhook_State::get_testmode(),
@@ -101,7 +104,7 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 	/**
 	 * Return a summary of Stripe account details.
 	 *
-	 * @return WP_REST_Response
+	 * @return \WP_REST_Response
 	 */
 	public function get_account_summary() {
 		$account = $this->account->get_cached_account_data();
@@ -115,7 +118,7 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 			$statement_descriptor = null;
 		}
 
-		return new WP_REST_Response(
+		return new \WP_REST_Response(
 			[
 				'has_pending_requirements' => $this->account->has_pending_requirements(),
 				'has_overdue_requirements' => $this->account->has_overdue_requirements(),
@@ -136,16 +139,16 @@ class WC_REST_Stripe_Account_Controller extends WC_Stripe_REST_Base_Controller {
 	/**
 	 * Retrieve the webhook status information.
 	 *
-	 * @return WP_REST_Response
+	 * @return \WP_REST_Response
 	 */
 	public function get_webhook_status_message() {
-		return new WP_REST_Response( WC_Stripe_Webhook_State::get_webhook_status_message() );
+		return new \WP_REST_Response( WC_Stripe_Webhook_State::get_webhook_status_message() );
 	}
 
 	/**
 	 * Clears the cached account data and returns the updated one.
 	 *
-	 * @return WP_REST_Response
+	 * @return \WP_REST_Response
 	 */
 	public function refresh_account() {
 		$this->account->clear_cache();

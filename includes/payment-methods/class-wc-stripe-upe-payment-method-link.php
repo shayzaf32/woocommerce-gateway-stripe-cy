@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -41,7 +44,7 @@ class WC_Stripe_UPE_Payment_Method_Link extends WC_Stripe_UPE_Payment_Method {
 
 		return in_array(
 			self::STRIPE_ID,
-			woocommerce_gateway_stripe()->get_main_stripe_gateway()->get_upe_enabled_payment_method_ids(),
+			woocommerce_gateway_stripe_eu()->get_main_stripe_gateway()->get_upe_enabled_payment_method_ids(),
 			true
 		);
 	}
@@ -80,7 +83,7 @@ class WC_Stripe_UPE_Payment_Method_Link extends WC_Stripe_UPE_Payment_Method {
 	 */
 	public function is_available() {
 		//if merchant is outside US, Link payment method should not be available
-		$cached_account_data = WC_Stripe::get_instance()->account->get_cached_account_data();
+		$cached_account_data = \WC_Eu_Stripe::get_instance()->account->get_cached_account_data();
 		$account_country     = $cached_account_data['country'] ?? null;
 
 		return 'US' === $account_country && parent::is_available();

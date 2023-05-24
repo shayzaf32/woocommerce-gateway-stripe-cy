@@ -29,7 +29,7 @@ class WC_REST_Stripe_Payment_Gateway_Controller_Test extends WP_UnitTestCase {
 	/**
 	 * Gateway instance that the controller uses.
 	 *
-	 * @var WC_Gateway_Stripe
+	 * @var \ElementorStripeEu\WC_Gateway_Stripe_Eu
 	 */
 	private $gateway;
 
@@ -213,7 +213,7 @@ class WC_REST_Stripe_Payment_Gateway_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @return WC_Gateway_Stripe
+	 * @return \ElementorStripeEu\WC_Gateway_Stripe_Eu
 	 */
 	private function get_gateway() {
 		return $this->gateway;

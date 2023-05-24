@@ -1,4 +1,10 @@
 <?php
+
+use \ElementorStripeEu\WC_Stripe_Helper;
+use \ElementorStripeEu\WC_Stripe_UPE_Payment_Method_CC;
+use \ElementorStripeEu\WC_Stripe_UPE_Payment_Gateway;
+use \ElementorStripeEu\WC_Stripe_Customer;
+
 /**
  * Unit tests for the UPE payment gateway
  */
@@ -437,7 +443,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 		$final_order = wc_get_order( $order_id );
 
 		$this->assertEquals( 'processing', $final_order->get_status() );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
 		$this->assertEquals( 'Credit card / debit card', $final_order->get_payment_method_title() );
 	}
@@ -483,7 +489,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 'processing', $final_order->get_status() );
 		$this->assertEquals( $payment_intent_id, $final_order->get_meta( '_stripe_intent_id', true ) );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
 	}
 
@@ -534,7 +540,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 'processing', $final_order->get_status() );
 		$this->assertEquals( $payment_intent_id, $final_order->get_meta( '_stripe_intent_id', true ) );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $generated_payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
 	}
 
@@ -586,7 +592,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 		$final_order = wc_get_order( $order_id );
 
 		$this->assertEquals( 'processing', $final_order->get_status() );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $generated_payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
 	}
 
@@ -768,7 +774,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'success', $response['result'] );
 		$this->assertEquals( 'processing', $final_order->get_status() );
 		$this->assertEquals( $payment_intent_id, $final_order->get_meta( '_stripe_intent_id', true ) );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
 		$this->assertMatchesRegularExpression( '/Charge ID: ch_mock/', $note->content );
 	}
@@ -826,7 +832,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'success', $response['result'] );
 		$this->assertEquals( 'pending', $final_order->get_status() );
 		$this->assertEquals( $payment_intent_id, $final_order->get_meta( '_stripe_intent_id', true ) );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
 		$this->assertMatchesRegularExpression( "/#wc-stripe-confirm-pi:$order_id:$client_secret/", $response['redirect'] );
 	}
@@ -953,7 +959,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'success', $response['result'] );
 		$this->assertEquals( 'processing', $final_order->get_status() );
 		$this->assertEquals( $payment_intent_id, $final_order->get_meta( '_stripe_intent_id', true ) );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
 		$this->assertMatchesRegularExpression( '/Charge ID: ch_mock/', $note->content );
 	}
@@ -1022,7 +1028,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 'fail', $response['result'] );
 		$this->assertEquals( 'failed', $final_order->get_status() );
-		$this->assertEquals( '', $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( '', $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 	}
 
 	/**
@@ -1345,7 +1351,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 'Credit card / debit card', $final_order->get_payment_method_title() );
 		$this->assertEquals( $payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertEquals( $payment_intent_id, $final_order->get_meta( '_stripe_intent_id', true ) );
 		$this->assertTrue( (bool) $final_order->get_meta( '_stripe_upe_redirect_processed', true ) );
 	}
@@ -1404,7 +1410,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 		$final_order = wc_get_order( $order_id );
 
 		$this->assertEquals( $payment_method_id, $final_order->get_meta( '_stripe_source_id', true ) );
-		$this->assertEquals( $customer_id, $final_order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( $customer_id, $final_order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 		$this->assertTrue( (bool) $final_order->get_meta( '_stripe_upe_redirect_processed', true ) );
 	}
 
@@ -1415,7 +1421,7 @@ class WC_Stripe_UPE_Payment_Gateway_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	private function set_stripe_account_data( $account_data ) {
-		WC_Stripe::get_instance()->account = $this->getMockBuilder( 'WC_Stripe_Account' )
+		WC_Stripe::get_instance()->account = $this->getMockBuilder( '\ElementorStripeEu\WC_Stripe_Account' )
 												->disableOriginalConstructor()
 												->setMethods( [ 'get_cached_account_data' ] )
 												->getMock();

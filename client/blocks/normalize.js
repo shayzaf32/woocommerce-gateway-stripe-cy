@@ -51,7 +51,7 @@ const normalizeOrderData = ( sourceEvent, paymentRequestType ) => {
 		shipping_postcode: '',
 		shipping_method: [ sourceEvent?.shippingOption?.id ],
 		order_comments: '',
-		payment_method: 'stripe',
+		payment_method: 'stripe_eu',
 		ship_to_different_address: 1,
 		terms: 1,
 		stripe_source: source.id,

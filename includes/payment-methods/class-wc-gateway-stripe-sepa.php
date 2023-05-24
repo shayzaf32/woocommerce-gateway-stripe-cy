@@ -3,10 +3,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \ElementorStripeEu\{
+	WC_Stripe_Exception,
+	WC_Stripe_API,
+	WC_Stripe_Helper,
+	WC_Stripe_Payment_Gateway,
+	WC_Gateway_Stripe_Eu,
+	WC_Stripe_Customer,
+};
 /**
  * Class that handles SEPA payment method.
  *
- * @extends WC_Gateway_Stripe
+ * @extends WC_Gateway_Stripe_Eu
  *
  * @since 4.0.0
  */
@@ -88,7 +96,7 @@ class WC_Gateway_Stripe_Sepa extends WC_Stripe_Payment_Gateway {
 		// Check if pre-orders are enabled and add support for them.
 		$this->maybe_init_pre_orders();
 
-		$main_settings              = get_option( 'woocommerce_stripe_settings' );
+		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
 		$this->title                = $this->get_option( 'title' );
 		$this->description          = $this->get_option( 'description' );
 		$this->enabled              = $this->get_option( 'enabled' );
@@ -175,7 +183,7 @@ class WC_Gateway_Stripe_Sepa extends WC_Stripe_Payment_Gateway {
 	 * Initialize Gateway Settings Form Fields.
 	 */
 	public function init_form_fields() {
-		$this->form_fields = require WC_STRIPE_PLUGIN_PATH . '/includes/admin/stripe-sepa-settings.php';
+		$this->form_fields = require WC_STRIPE_EU_PLUGIN_PATH . '/includes/admin/stripe-sepa-settings.php';
 	}
 
 	/**
@@ -300,7 +308,7 @@ class WC_Gateway_Stripe_Sepa extends WC_Stripe_Payment_Gateway {
 
 			if ( $create_account ) {
 				$new_customer_id     = $order->get_customer_id();
-				$new_stripe_customer = new WC_Stripe_Customer( $new_customer_id );
+				$new_stripe_customer = new \ElementorStripeEu\WC_Stripe_Customer( $new_customer_id );
 				$new_stripe_customer->create_customer();
 			}
 
@@ -323,8 +331,8 @@ class WC_Gateway_Stripe_Sepa extends WC_Stripe_Payment_Gateway {
 				if ( ! empty( $response->error ) ) {
 					// Customer param wrong? The user may have been deleted on stripe's end. Remove customer_id. Can be retried without.
 					if ( $this->is_no_such_customer_error( $response->error ) ) {
-						delete_user_option( $order->get_customer_id(), '_stripe_customer_id' );
-						$order->delete_meta_data( '_stripe_customer_id' );
+						delete_user_option( $order->get_customer_id(), WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
+						$order->delete_meta_data( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID );
 						$order->save();
 					}
 

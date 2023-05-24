@@ -1,4 +1,7 @@
 <?php
+
+use \ElementorStripeEu\WC_Stripe_UPE_Payment_Method_Link;
+
 /**
  * Unit tests for UPE payment methods
  */
@@ -299,9 +302,9 @@ class WC_Stripe_UPE_Payment_Method_Test extends WP_UnitTestCase {
 		$this->set_mock_payment_method_return_value( 'get_capabilities_response', self::MOCK_INACTIVE_CAPABILITIES_RESPONSE );
 
 		// Disable testmode.
-		$stripe_settings             = get_option( 'woocommerce_stripe_settings' );
+		$stripe_settings             = get_option( 'woocommerce_stripe_eu_settings' );
 		$stripe_settings['testmode'] = 'no';
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
 		$card_method       = $this->mock_payment_methods['card'];
 		$giropay_method    = $this->mock_payment_methods['giropay'];
@@ -331,9 +334,9 @@ class WC_Stripe_UPE_Payment_Method_Test extends WP_UnitTestCase {
 	 */
 	public function test_payment_methods_are_only_enabled_when_capability_is_active() {
 		// Disable testmode.
-		$stripe_settings             = get_option( 'woocommerce_stripe_settings' );
+		$stripe_settings             = get_option( 'woocommerce_stripe_eu_settings' );
 		$stripe_settings['testmode'] = 'no';
-		update_option( 'woocommerce_stripe_settings', $stripe_settings );
+		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
 
 		$payment_method_ids = array_map( [ $this, 'get_id' ], $this->mock_payment_methods );
 		foreach ( $payment_method_ids as $id ) {
@@ -435,13 +438,13 @@ class WC_Stripe_UPE_Payment_Method_Test extends WP_UnitTestCase {
 				case WC_Stripe_UPE_Payment_Method_Link::STRIPE_ID:
 					$link_payment_method_mock = $this->array_to_object( self::MOCK_LINK_PAYMENT_METHOD_TEMPLATE );
 					$token                    = $payment_method->create_payment_token_for_user( $user_id, $link_payment_method_mock );
-					$this->assertTrue( 'WC_Payment_Token_Link' === get_class( $token ) );
+					$this->assertTrue( '\ElementorStripeEu\WC_Payment_Token_Link' === get_class( $token ) );
 					$this->assertSame( $token->get_email(), $link_payment_method_mock->link->email );
 					break;
 				default:
 					$sepa_payment_method_mock = $this->array_to_object( self::MOCK_SEPA_PAYMENT_METHOD_TEMPLATE );
 					$token                    = $payment_method->create_payment_token_for_user( $user_id, $sepa_payment_method_mock );
-					$this->assertTrue( 'WC_Payment_Token_SEPA' === get_class( $token ) );
+					$this->assertTrue( '\ElementorStripeEu\WC_Payment_Token_SEPA' === get_class( $token ) );
 					$this->assertSame( $token->get_last4(), $sepa_payment_method_mock->sepa_debit->last4 );
 					$this->assertSame( $token->get_token(), $sepa_payment_method_mock->id );
 

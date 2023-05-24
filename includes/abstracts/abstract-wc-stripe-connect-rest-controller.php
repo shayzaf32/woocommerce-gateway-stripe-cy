@@ -1,5 +1,7 @@
 <?php
 
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -9,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Stripe Connect base REST controller class.
  */
-abstract class WC_Stripe_Connect_REST_Controller extends WP_REST_Controller {
+abstract class WC_Stripe_Connect_REST_Controller extends \WP_REST_Controller {
 
 	/**
 	 * Endpoint namespace.
@@ -156,10 +158,10 @@ abstract class WC_Stripe_Connect_REST_Controller extends WP_REST_Controller {
 	 *
 	 * See: https://pantheon.io/docs/cache-control/
 	 *
-	 * @param  WP_REST_Response $response REST API response.
-	 * @param  WP_REST_Server   $server   server.
+	 * @param  \WP_REST_Response $response REST API response.
+	 * @param  \WP_REST_Server   $server   server.
 	 *
-	 * @return WP_REST_Response passthrough $response parameter
+	 * @return \WP_REST_Response passthrough $response parameter
 	 */
 	public function send_nocache_header( $response, $server ) {
 

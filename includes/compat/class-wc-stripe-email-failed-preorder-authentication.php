@@ -1,4 +1,7 @@
 <?php
+
+namespace ElementorStripeEu;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -19,7 +22,7 @@ class WC_Stripe_Email_Failed_Preorder_Authentication extends WC_Stripe_Email_Fai
 	/**
 	 * Constructor.
 	 *
-	 * @param WC_Email[] $email_classes All existing instances of WooCommerce emails.
+	 * @param \WC_Email[] $email_classes All existing instances of WooCommerce emails.
 	 */
 	public function __construct( $email_classes = [] ) {
 		$this->id             = 'failed_preorder_sca_authentication';
@@ -29,7 +32,7 @@ class WC_Stripe_Email_Failed_Preorder_Authentication extends WC_Stripe_Email_Fai
 
 		$this->template_html  = 'emails/failed-preorder-authentication.php';
 		$this->template_plain = 'emails/plain/failed-preorder-authentication.php';
-		$this->template_base  = plugin_dir_path( WC_STRIPE_MAIN_FILE ) . 'templates/';
+		$this->template_base  = plugin_dir_path( WC_STRIPE_EU_MAIN_FILE ) . 'templates/';
 
 		// Use the "authentication required" hook to add the correct, later hook.
 		add_action( 'wc_gateway_stripe_process_payment_authentication_required', [ $this, 'trigger' ] );
@@ -46,7 +49,7 @@ class WC_Stripe_Email_Failed_Preorder_Authentication extends WC_Stripe_Email_Fai
 	 * When autnentication is required, this adds another action to `wc_pre_orders_pre_order_completed`
 	 * in order to send the authentication required email when the custom pre-orders message is available.
 	 *
-	 * @param WC_Order $order The order whose payment is failing.
+	 * @param \WC_Order $order The order whose payment is failing.
 	 */
 	public function trigger( $order ) {
 		if ( class_exists( 'WC_Pre_Orders_Order' ) && WC_Pre_Orders_Order::order_contains_pre_order( $order->get_id() ) ) {
@@ -61,7 +64,7 @@ class WC_Stripe_Email_Failed_Preorder_Authentication extends WC_Stripe_Email_Fai
 	/**
 	 * Triggers the email while also disconnecting the original Pre-Orders email.
 	 *
-	 * @param WC_Order $order The order that is being paid.
+	 * @param \WC_Order $order The order that is being paid.
 	 * @param string   $message The message, which should be added to the email.
 	 */
 	public function send_email( $order, $message ) {

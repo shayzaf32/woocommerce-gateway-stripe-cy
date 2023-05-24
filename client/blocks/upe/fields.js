@@ -200,7 +200,7 @@ const UPEField = ( {
 	useEffect(
 		() =>
 			onPaymentProcessing( () => {
-				if ( activePaymentMethod !== 'stripe' ) {
+				if ( activePaymentMethod !== 'stripe_eu' ) {
 					return;
 				}
 
