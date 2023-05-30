@@ -290,7 +290,7 @@ jQuery( function( $ ) {
 		 * @return {boolean}
 		 */
 		isStripeChosen: function() {
-			return $( '#payment_method_stripe_eu, #payment_method_stripe_bancontact, #payment_method_stripe_sofort, #payment_method_stripe_giropay, #payment_method_stripe_ideal, #payment_method_stripe_alipay, #payment_method_stripe_sepa, #payment_method_stripe_eps, #payment_method_stripe_multibanco, #payment_method_stripe_boleto, #payment_method_stripe_oxxo' ).is( ':checked' ) || ( $( '#payment_method_stripe_eu' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe-payment-token"]:checked' ).val() ) || ( $( '#payment_method_stripe_sepa' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe-payment-token"]:checked' ).val() );
+			return $( '#payment_method_stripe_eu, #payment_method_stripe_bancontact, #payment_method_stripe_sofort, #payment_method_stripe_giropay, #payment_method_stripe_ideal, #payment_method_stripe_alipay, #payment_method_stripe_sepa, #payment_method_stripe_eps, #payment_method_stripe_multibanco, #payment_method_stripe_boleto, #payment_method_stripe_oxxo' ).is( ':checked' ) || ( $( '#payment_method_stripe_eu' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe_eu-payment-token"]:checked' ).val() ) || ( $( '#payment_method_stripe_sepa' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe_eu-payment-token"]:checked' ).val() );
 		},
 
 		/**
@@ -301,12 +301,8 @@ jQuery( function( $ ) {
 		isStripeSaveCardChosen: function() {
 			return (
 				$( '#payment_method_stripe_eu' ).is( ':checked' ) &&
-				$( 'input[name="wc-stripe-payment-token"]' ).is( ':checked' ) &&
-				'new' !== $( 'input[name="wc-stripe-payment-token"]:checked' ).val()
-			) || (
-				$( '#payment_method_stripe_sepa' ).is( ':checked' ) &&
-				$( 'input[name="wc-stripe_sepa-payment-token"]' ).is( ':checked' ) &&
-				'new' !== $( 'input[name="wc-stripe_sepa-payment-token"]:checked' ).val()
+				$( 'input[name="wc-stripe_eu-payment-token"]' ).is( ':checked' ) &&
+				'new' !== $( 'input[name="wc-stripe_eu-payment-token"]:checked' ).val()
 			);
 		},
 
@@ -425,7 +421,7 @@ jQuery( function( $ ) {
 		 * @return {boolean}
 		 */
 		hasSource: function() {
-			return 0 < $( 'input.stripe-source' ).length;
+			return 0 < $( 'input.stripe-eu-source' ).length;
 		},
 
 		/**
@@ -542,7 +538,6 @@ jQuery( function( $ ) {
 
 				return stripe_eu.createSource( iban, extra_details ).then( wc_stripe_form.sourceResponse );
 			}
-			console.log("423423432432");
 			// This part is exclusive to card payments so we create a payment method, not a source.
 			return stripe_eu.createPaymentMethod( {
 				type: 'card',
@@ -569,8 +564,8 @@ jQuery( function( $ ) {
 
 			wc_stripe_form.form.append(
 				$( '<input type="hidden" />' )
-					.addClass( 'stripe-source' )
-					.attr( 'name', 'stripe_source' )
+					.addClass( 'stripe-eu-source' )
+					.attr( 'name', 'stripe_eu_source' )
 					.val( payment_method_id )
 			);
 
@@ -796,7 +791,7 @@ jQuery( function( $ ) {
 		 * Removes all Stripe errors and hidden fields with IDs from the form.
 		 */
 		reset: function() {
-			$( '.wc-stripe-error, .stripe-source' ).remove();
+			$( '.wc-stripe-error, .stripe-eu-source' ).remove();
 		},
 
 		/**
@@ -805,7 +800,7 @@ jQuery( function( $ ) {
 		 * @param {Event} e The event with the error.
 		 */
 		onSepaError: function( e ) {
-			var errorContainer = wc_stripe_form.getSelectedPaymentElement().parents( 'li' ).eq( 0 ).find( '.stripe-source-errors' );
+			var errorContainer = wc_stripe_form.getSelectedPaymentElement().parents( 'li' ).eq( 0 ).find( '.stripe-eu-source-errors' );
 
 			if ( ! e.error ) {
 				$( errorContainer ).html( '' );
@@ -840,14 +835,14 @@ jQuery( function( $ ) {
 
 				if ( selectedToken.closest( '.woocommerce-SavedPaymentMethods-new' ).length ) {
 					// Display the error next to the CC fields if a new card is being entered.
-					errorContainer = $( '#wc-stripe-cc-form .stripe-source-errors' );
+					errorContainer = $( '#wc-stripe_eu-cc-form .stripe-eu-source-errors' );
 				} else {
 					// Display the error next to the chosen saved card.
-					errorContainer = selectedToken.closest( 'li' ).find( '.stripe-source-errors' );
+					errorContainer = selectedToken.closest( 'li' ).find( '.stripe-eu-source-errors' );
 				}
 			} else {
 				// When no saved cards are available, display the error next to CC fields.
-				errorContainer = selectedMethodElement.find( '.stripe-source-errors' );
+				errorContainer = selectedMethodElement.find( '.stripe-eu-source-errors' );
 			}
 
 			/*

@@ -1,4 +1,6 @@
 <?php
+
+use \ElementorStripeEu\WC_Stripe_Customer;
 /**
  * Class WC_REST_Stripe_Orders_Controller.
  *
@@ -73,9 +75,9 @@ class WC_REST_Stripe_Orders_Controller_Test extends WP_UnitTestCase {
 
 		$order    = WC_Helper_Order::create_order();
 		$endpoint = '/' . strval( $order->get_id() ) . '/create_customer';
-		$order->add_meta_data( '_stripe_customer_id', 'cus_12345', true );
+		$order->add_meta_data( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, 'cus_12345', true );
 		$order->save();
-		$this->assertEquals( 'cus_12345', $order->get_meta( '_stripe_customer_id', true ) );
+		$this->assertEquals( 'cus_12345', $order->get_meta( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, true ) );
 
 		// Mock response from Stripe API using request arguments.
 		$test_request = function ( $preempt, $parsed_args, $url ) {

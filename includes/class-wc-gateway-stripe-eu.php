@@ -298,7 +298,7 @@ class WC_Gateway_Stripe_Eu extends WC_Stripe_Payment_Gateway {
 			<?php } ?>
 
 			<!-- Used to display form errors -->
-			<div class="stripe-source-errors" role="alert"></div>
+			<div class="stripe-eu-source-errors" role="alert"></div>
 			<?php do_action( 'woocommerce_credit_card_form_end', $this->id ); ?>
 			<div class="clear"></div>
 		</fieldset>
@@ -756,7 +756,7 @@ class WC_Gateway_Stripe_Eu extends WC_Stripe_Payment_Gateway {
 	 */
 	public function get_saved_payment_method_option_html( $token ) {
 		$html          = parent::get_saved_payment_method_option_html( $token );
-		$error_wrapper = '<div class="stripe-source-errors" role="alert"></div>';
+		$error_wrapper = '<div class="stripe-eu-source-errors" role="alert"></div>';
 
 		return preg_replace( '~</(\w+)>\s*$~', "$error_wrapper</$1>", $html );
 	}

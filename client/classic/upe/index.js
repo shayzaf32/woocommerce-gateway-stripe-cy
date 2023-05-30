@@ -609,14 +609,13 @@ jQuery( function ( $ ) {
 	 */
 	function isUsingSavedPaymentMethod() {
 		return (
-			$( '#wc-stripe-payment-token-new' ).length &&
-			! $( '#wc-stripe-payment-token-new' ).is( ':checked' )
+			$( '#wc-stripe_eu-payment-token-new' ).length &&
+			! $( '#wc-stripe_eu-payment-token-new' ).is( ':checked' )
 		);
 	}
 
 	// Handle the checkout form when WooCommerce Gateway Stripe is chosen.
 	$( 'form.checkout' ).on( 'checkout_place_order_stripe_eu', function () {
-		console.log(" hereee4324232423");
 		if ( ! isUsingSavedPaymentMethod() ) {
 			if ( isUPEEnabled && paymentIntentId ) {
 				handleUPECheckout( $( this ) );

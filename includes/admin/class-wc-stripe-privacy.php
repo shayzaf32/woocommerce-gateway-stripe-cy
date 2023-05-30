@@ -6,7 +6,7 @@ if ( ! class_exists( 'WC_Abstract_Privacy' ) ) {
 	return;
 }
 
-class WC_Stripe_Privacy extends WC_Abstract_Privacy {
+class WC_Stripe_Privacy extends \WC_Abstract_Privacy {
 	/**
 	 * Constructor
 	 */
@@ -79,7 +79,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 			'page'           => $page,
 		];
 
-		if ( $user instanceof WP_User ) {
+		if ( $user instanceof \WP_User ) {
 			$order_query['customer_id'] = (int) $user->ID;
 		} else {
 			$order_query['billing_email'] = $email_address;
@@ -223,7 +223,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 		$user           = get_user_by( 'email', $email_address ); // Check if user has an ID in the DB to load stored personal data.
 		$data_to_export = [];
 
-		if ( $user instanceof WP_User ) {
+		if ( $user instanceof \WP_User ) {
 			$stripe_user = new \ElementorStripeEu\WC_Stripe_Customer( $user->ID );
 
 			$data_to_export[] = [
@@ -262,7 +262,7 @@ class WC_Stripe_Privacy extends WC_Abstract_Privacy {
 		$stripe_customer_id = '';
 		$stripe_source_id   = '';
 
-		if ( $user instanceof WP_User ) {
+		if ( $user instanceof \WP_User ) {
 			$stripe_customer_id = get_user_option( WC_Stripe_Customer::STRIPE_EU_CUSTOMER_ID, $user->ID );
 			$stripe_source_id   = get_user_option( '_stripe_source_id', $user->ID );
 		}
