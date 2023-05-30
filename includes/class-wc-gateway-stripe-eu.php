@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WC_Gateway_Stripe_Eu extends WC_Stripe_Payment_Gateway {
 
-	const ID = 'stripe_eu';
+	const ID = 'stripe-eu';
 
 	/**
 	 * Should we capture Credit cards
@@ -75,8 +75,8 @@ class WC_Gateway_Stripe_Eu extends WC_Stripe_Payment_Gateway {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->id           = static::ID; // TODO consider to add method of get_id() instead
-		$this->method_title = __( 'Stripe EU', 'woocommerce-gateway-stripe' ); // TODO consider to add method of get_name() instead
+		$this->id           = static::ID;
+		$this->method_title = __( 'Stripe Europe', 'woocommerce-gateway-stripe' );
 		/* translators: 1) link to Stripe register page 2) link to Stripe api keys page */
 		$this->method_description = __( 'Stripe works by adding payment fields on the checkout and then sending the details to Stripe for verification.', 'woocommerce-gateway-stripe' );
 		$this->has_fields         = true;

@@ -42,7 +42,7 @@ class WC_Stripe_API {
 	 */
 	public static function get_secret_key() {
 		if ( ! self::$secret_key ) {
-			$options         = get_option( 'woocommerce_stripe_eu_settings' );
+			$options         = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 			$secret_key      = $options['secret_key'] ?? '';
 			$test_secret_key = $options['test_secret_key'] ?? '';
 
@@ -282,7 +282,7 @@ class WC_Stripe_API {
 	 *
 	 * @param string $payment_method_id The ID of the payment method to retrieve.
 	 *
-	 * @return stdClass  The payment method object.
+	 * @return \stdClass  The payment method object.
 	 */
 	public static function get_payment_method( string $payment_method_id ) {
 		// Sources have a separate API.

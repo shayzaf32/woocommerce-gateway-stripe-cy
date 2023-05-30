@@ -123,7 +123,7 @@ abstract class WC_Stripe_Payment_Gateway_Voucher extends WC_Stripe_Payment_Gatew
 		// Load the settings.
 		$this->init_settings();
 
-		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
+		$main_settings              = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$this->title                = $this->get_option( 'title' );
 		$this->description          = $this->get_option( 'description' );
 		$this->enabled              = $this->get_option( 'enabled' );

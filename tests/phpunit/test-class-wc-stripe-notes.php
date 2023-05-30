@@ -1,6 +1,7 @@
 <?php
 
 use \ElementorStripeEu\WC_Stripe_UPE_StripeLink_Note;
+use \ElementorStripeEu\WC_Stripe_Constants;
 
 /**
  * Class WC_Stripe_Inbox_Notes_Test
@@ -34,7 +35,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 		update_option( '_wcstripe_feature_upe', 'yes' );
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'no',
@@ -45,7 +46,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 	public function tear_down() {
 		woocommerce_gateway_stripe_eu()->connect = $this->stripe_connect_original;
 		delete_option( '_wcstripe_feature_upe' );
-		delete_option( 'woocommerce_stripe_eu_settings' );
+		delete_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 
 		parent::tear_down();
 	}
@@ -59,7 +60,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_stripelink_note() {
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
@@ -90,7 +91,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_notes_does_not_create_availability_note_when_upe_is_enbled() {
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
@@ -114,7 +115,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_notes_does_not_create_note_when_stripe_is_disabled() {
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'enabled'                         => 'no',
 				'upe_checkout_experience_enabled' => 'no',
@@ -130,7 +131,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_upe_notes_does_not_create_note_when_upe_has_been_manually_disabled() {
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'disabled',
@@ -146,7 +147,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_stripelink_note_unavailable_if_cc_not_enabled() {
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
@@ -162,7 +163,7 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	public function test_create_stripelink_note_unavailable_link_enabled() {
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'enabled'                         => 'yes',
 				'upe_checkout_experience_enabled' => 'yes',
@@ -173,9 +174,9 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 		$this->set_enabled_payment_methods( [ 'card', 'link' ] );
 
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			array_merge(
-				get_option( 'woocommerce_stripe_eu_settings' ),
+				get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME ),
 				[
 					'upe_checkout_experience_accepted_payments' => [ 'card', 'link' ],
 				]
@@ -189,9 +190,9 @@ class WC_Stripe_Inbox_Notes_Test extends WP_UnitTestCase {
 
 	private function set_enabled_payment_methods( $payment_methods ) {
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			array_merge(
-				get_option( 'woocommerce_stripe_eu_settings' ),
+				get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME ),
 				[
 					'upe_checkout_experience_accepted_payments' => $payment_methods,
 				]

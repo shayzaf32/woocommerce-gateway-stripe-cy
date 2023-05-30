@@ -123,7 +123,7 @@ class WC_Stripe_Admin_Notices {
 		$show_curl_notice    = get_option( 'wc_stripe_show_curl_notice' );
 		$show_sca_notice     = get_option( 'wc_stripe_show_sca_notice' );
 		$changed_keys_notice = get_option( 'wc_stripe_show_changed_keys_notice' );
-		$options             = get_option( 'woocommerce_stripe_eu_settings' );
+		$options             = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$testmode            = ( isset( $options['testmode'] ) && 'yes' === $options['testmode'] ) ? true : false;
 		$test_pub_key        = isset( $options['test_publishable_key'] ) ? $options['test_publishable_key'] : '';
 		$test_secret_key     = isset( $options['test_secret_key'] ) ? $options['test_secret_key'] : '';
@@ -188,7 +188,7 @@ class WC_Stripe_Admin_Notices {
 			if ( empty( $show_keys_notice ) ) {
 				$secret = WC_Stripe_API::get_secret_key();
 				// phpcs:ignore
-				$should_show_notice_on_page = ! ( isset( $_GET['page'], $_GET['section'] ) && 'wc-settings' === $_GET['page'] && 0 === strpos( $_GET['section'], 'stripe_eu' ) );
+				$should_show_notice_on_page = ! ( isset( $_GET['page'], $_GET['section'] ) && 'wc-settings' === $_GET['page'] && 0 === strpos( $_GET['section'], WC_Gateway_Stripe_Eu::ID ) );
 
 				if ( empty( $secret ) && $should_show_notice_on_page ) {
 					$setting_link = $this->get_setting_link();

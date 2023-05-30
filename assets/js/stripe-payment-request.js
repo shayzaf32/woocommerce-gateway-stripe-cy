@@ -114,7 +114,7 @@ jQuery( function( $ ) {
 				shipping_postcode:         '',
 				shipping_method:           [ null === evt.shippingOption ? null : evt.shippingOption.id ],
 				order_comments:            '',
-				payment_method:            'stripe_eu',
+				payment_method:            'stripe-eu',
 				ship_to_different_address: 1,
 				terms:                     1,
 				stripe_source:             source.id,

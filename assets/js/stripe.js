@@ -211,7 +211,7 @@ jQuery( function( $ ) {
 
 			$( 'form.woocommerce-checkout' )
 				.on(
-					'checkout_place_order_stripe_eu checkout_place_order_stripe_bancontact checkout_place_order_stripe_sofort checkout_place_order_stripe_giropay checkout_place_order_stripe_ideal checkout_place_order_stripe_alipay checkout_place_order_stripe_sepa checkout_place_order_stripe_boleto checkout_place_order_stripe_oxxo',
+					'checkout_place_order_stripe-eu checkout_place_order_stripe_bancontact checkout_place_order_stripe_sofort checkout_place_order_stripe_giropay checkout_place_order_stripe_ideal checkout_place_order_stripe_alipay checkout_place_order_stripe_sepa checkout_place_order_stripe_boleto checkout_place_order_stripe_oxxo',
 					this.onSubmit
 				);
 
@@ -290,7 +290,7 @@ jQuery( function( $ ) {
 		 * @return {boolean}
 		 */
 		isStripeChosen: function() {
-			return $( '#payment_method_stripe_eu, #payment_method_stripe_bancontact, #payment_method_stripe_sofort, #payment_method_stripe_giropay, #payment_method_stripe_ideal, #payment_method_stripe_alipay, #payment_method_stripe_sepa, #payment_method_stripe_eps, #payment_method_stripe_multibanco, #payment_method_stripe_boleto, #payment_method_stripe_oxxo' ).is( ':checked' ) || ( $( '#payment_method_stripe_eu' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe_eu-payment-token"]:checked' ).val() ) || ( $( '#payment_method_stripe_sepa' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe_eu-payment-token"]:checked' ).val() );
+			return $( '#payment_method_stripe-eu, #payment_method_stripe_bancontact, #payment_method_stripe_sofort, #payment_method_stripe_giropay, #payment_method_stripe_ideal, #payment_method_stripe_alipay, #payment_method_stripe_sepa, #payment_method_stripe_eps, #payment_method_stripe_multibanco, #payment_method_stripe_boleto, #payment_method_stripe_oxxo' ).is( ':checked' ) || ( $( '#payment_method_stripe-eu' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe-eu-payment-token"]:checked' ).val() ) || ( $( '#payment_method_stripe_sepa' ).is( ':checked' ) && 'new' === $( 'input[name="wc-stripe-eu-payment-token"]:checked' ).val() );
 		},
 
 		/**
@@ -300,9 +300,9 @@ jQuery( function( $ ) {
 		 */
 		isStripeSaveCardChosen: function() {
 			return (
-				$( '#payment_method_stripe_eu' ).is( ':checked' ) &&
-				$( 'input[name="wc-stripe_eu-payment-token"]' ).is( ':checked' ) &&
-				'new' !== $( 'input[name="wc-stripe_eu-payment-token"]:checked' ).val()
+				$( '#payment_method_stripe-eu' ).is( ':checked' ) &&
+				$( 'input[name="wc-stripe-eu-payment-token"]' ).is( ':checked' ) &&
+				'new' !== $( 'input[name="wc-stripe-eu-payment-token"]:checked' ).val()
 			);
 		},
 
@@ -312,7 +312,7 @@ jQuery( function( $ ) {
 		 * @return {boolean}
 		 */
 		isStripeCardChosen: function() {
-			return $( '#payment_method_stripe_eu' ).is( ':checked' );
+			return $( '#payment_method-stripe_eu' ).is( ':checked' );
 		},
 
 		/**

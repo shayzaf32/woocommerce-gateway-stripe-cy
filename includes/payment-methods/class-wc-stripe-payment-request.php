@@ -72,7 +72,7 @@ class WC_Stripe_Payment_Request {
 	 */
 	public function __construct() {
 		self::$_this           = $this;
-		$this->stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
+		$this->stripe_settings = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, [] );
 		$this->testmode        = ( ! empty( $this->stripe_settings['testmode'] ) && 'yes' === $this->stripe_settings['testmode'] ) ? true : false;
 		$this->publishable_key = ! empty( $this->stripe_settings['publishable_key'] ) ? $this->stripe_settings['publishable_key'] : '';
 		$this->secret_key      = ! empty( $this->stripe_settings['secret_key'] ) ? $this->stripe_settings['secret_key'] : '';
@@ -465,7 +465,7 @@ class WC_Stripe_Payment_Request {
 		$order        = wc_get_order( $post->ID );
 		$method_title = is_object( $order ) ? $order->get_payment_method_title() : '';
 
-		if ( 'stripe_eu' === $id && ! empty( $method_title ) ) {
+		if ( WC_Gateway_Stripe_Eu::ID === $id && ! empty( $method_title ) ) {
 			if ( 'Apple Pay (Stripe)' === $method_title
 				|| 'Google Pay (Stripe)' === $method_title
 				|| 'Payment Request (Stripe)' === $method_title
@@ -524,7 +524,7 @@ class WC_Stripe_Payment_Request {
 	 * @return  void
 	 */
 	public function add_order_meta( $order_id, $posted_data ) {
-		if ( empty( $_POST['payment_request_type'] ) || ! isset( $_POST['payment_method'] ) || 'stripe_eu' !== $_POST['payment_method'] ) {
+		if ( empty( $_POST['payment_request_type'] ) || ! isset( $_POST['payment_method'] ) || WC_Gateway_Stripe_Eu::ID !== $_POST['payment_method'] ) {
 			return;
 		}
 
@@ -762,8 +762,8 @@ class WC_Stripe_Payment_Request {
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-		wp_register_script( 'stripe_eu', 'https://js.stripe.com/v3/', '', '3.0', true );
-		wp_register_script( 'wc_stripe_eu_payment_request', plugins_url( 'assets/js/stripe-payment-request' . $suffix . '.js', WC_STRIPE_EU_MAIN_FILE ), [ 'jquery', 'stripe_eu' ], WC_STRIPE_EU_VERSION, true );
+		wp_register_script( WC_Gateway_Stripe_Eu::ID, 'https://js.stripe.com/v3/', '', '3.0', true );
+		wp_register_script( 'wc_stripe_eu_payment_request', plugins_url( 'assets/js/stripe-payment-request' . $suffix . '.js', WC_STRIPE_EU_MAIN_FILE ), [ 'jquery', WC_Gateway_Stripe_Eu::ID ], WC_STRIPE_EU_VERSION, true );
 
 		wp_localize_script(
 			'wc_stripe_eu_payment_request',
@@ -799,7 +799,7 @@ class WC_Stripe_Payment_Request {
 	public function display_payment_request_button_html() {
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
 
-		if ( ! isset( $gateways['stripe_eu'] ) ) {
+		if ( ! isset( $gateways[ WC_Gateway_Stripe_Eu::ID ] ) ) {
 			return;
 		}
 
@@ -837,7 +837,7 @@ class WC_Stripe_Payment_Request {
 	public function display_payment_request_button_separator_html() {
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
 
-		if ( ! isset( $gateways['stripe_eu'] ) ) {
+		if ( ! isset( $gateways[ WC_Gateway_Stripe_Eu::ID ] ) ) {
 			return;
 		}
 

@@ -149,8 +149,8 @@ jQuery( function ( $ ) {
 			$( '.woocommerce-SavedPaymentMethods-saveNew' ).show();
 		} else {
 			$( '.woocommerce-SavedPaymentMethods-saveNew' ).hide();
-			$( 'input#wc-stripe_eu-new-payment-method' ).prop( 'checked', false );
-			$( 'input#wc-stripe_eu-new-payment-method' ).trigger( 'change' );
+			$( 'input#wc-stripe-eu-new-payment-method' ).prop( 'checked', false );
+			$( 'input#wc-stripe-eu-new-payment-method' ).trigger( 'change' );
 		}
 	};
 
@@ -410,7 +410,7 @@ jQuery( function ( $ ) {
 
 		try {
 			const isSavingPaymentMethod = $(
-				'#wc-stripe_eu-new-payment-method'
+				'#wc-stripe-eu-new-payment-method'
 			).is( ':checked' );
 			const savePaymentMethod = isSavingPaymentMethod ? 'yes' : 'no';
 
@@ -552,7 +552,7 @@ jQuery( function ( $ ) {
 	const maybeShowAuthenticationModal = () => {
 		const paymentMethodId = $( '#wc-stripe-payment-method' ).val();
 
-		const savePaymentMethod = $( '#wc-stripe_eu-new-payment-method' ).is(
+		const savePaymentMethod = $( '#wc-stripe-eu-new-payment-method' ).is(
 			':checked'
 		);
 		const confirmation = api.confirmIntent(
@@ -609,13 +609,13 @@ jQuery( function ( $ ) {
 	 */
 	function isUsingSavedPaymentMethod() {
 		return (
-			$( '#wc-stripe_eu-payment-token-new' ).length &&
-			! $( '#wc-stripe_eu-payment-token-new' ).is( ':checked' )
+			$( '#wc-stripe-eu-payment-token-new' ).length &&
+			! $( '#wc-stripe-eu-payment-token-new' ).is( ':checked' )
 		);
 	}
 
 	// Handle the checkout form when WooCommerce Gateway Stripe is chosen.
-	$( 'form.checkout' ).on( 'checkout_place_order_stripe_eu', function () {
+	$( 'form.checkout' ).on( 'checkout_place_order_stripe-eu', function () {
 		if ( ! isUsingSavedPaymentMethod() ) {
 			if ( isUPEEnabled && paymentIntentId ) {
 				handleUPECheckout( $( this ) );
@@ -648,8 +648,8 @@ jQuery( function ( $ ) {
 
 	// Add terms parameter to UPE if save payment information checkbox is checked.
 	// This shows required legal mandates when customer elects to save payment method during checkout.
-	$( document ).on( 'change', '#wc-stripe_eu-new-payment-method', () => {
-		const value = $( '#wc-stripe_eu-new-payment-method' ).is( ':checked' )
+	$( document ).on( 'change', '#wc-stripe-eu-new-payment-method', () => {
+		const value = $( '#wc-stripe-eu-new-payment-method' ).is( ':checked' )
 			? 'always'
 			: 'never';
 		if ( isUPEEnabled && upeElement ) {

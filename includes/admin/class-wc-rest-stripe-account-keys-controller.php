@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
  * @since 5.6.0
  */
 class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Controller {
-	const STRIPE_GATEWAY_SETTINGS_OPTION_NAME = 'woocommerce_stripe_eu_settings';
+	const STRIPE_GATEWAY_SETTINGS_OPTION_NAME = 'woocommerce_stripe-eu_settings';
 
 	/**
 	 * Endpoint path.
@@ -183,9 +183,9 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 	/**
 	 * Update the data.
 	 *
-	 * @param WP_REST_Request $request Full data about the request.
+	 * @param \WP_REST_Request $request Full data about the request.
 	 */
-	public function set_account_keys( WP_REST_Request $request ) {
+	public function set_account_keys( \WP_REST_Request $request ) {
 		$publishable_key      = $request->get_param( 'publishable_key' );
 		$secret_key           = $request->get_param( 'secret_key' );
 		$webhook_secret       = $request->get_param( 'webhook_secret' );
@@ -230,6 +230,6 @@ class WC_REST_Stripe_Account_Keys_Controller extends WC_Stripe_REST_Base_Control
 		// Gives an instant reply if the connection was succesful or not + rebuild the cache for the next request
 		$account = $this->account->get_cached_account_data();
 
-		return new WP_REST_Response( $account, 200 );
+		return new \WP_REST_Response( $account, 200 );
 	}
 }

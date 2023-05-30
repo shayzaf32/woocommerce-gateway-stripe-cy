@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe_Eu {
 
-	const ID = 'stripe_eu';
+	const ID = 'stripe-eu';
 
 	/**
 	 * Upe Available Methods
@@ -130,7 +130,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe_Eu {
 		// Check if pre-orders are enabled and add support for them.
 		$this->maybe_init_pre_orders();
 
-		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
+		$main_settings              = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$this->title                = ! empty( $this->get_option( 'title_upe' ) ) ? $this->get_option( 'title_upe' ) : $this->form_fields['title_upe']['default'];
 		$this->description          = '';
 		$this->enabled              = $this->get_option( 'enabled' );
@@ -235,7 +235,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe_Eu {
 		}
 
 		wp_register_script(
-			'stripe_eu',
+			static::ID,
 			'https://js.stripe.com/v3/',
 			[],
 			'3.0',
@@ -245,7 +245,7 @@ class WC_Stripe_UPE_Payment_Gateway extends WC_Gateway_Stripe_Eu {
 		wp_register_script(
 			'wc-stripe-upe-classic',
 			WC_STRIPE_EU_PLUGIN_URL . '/build/upe_classic.js',
-			array_merge( [ 'stripe_eu', 'wc-checkout' ], $dependencies ),
+			array_merge( [ static::ID, 'wc-checkout' ], $dependencies ),
 			$version,
 			true
 		);

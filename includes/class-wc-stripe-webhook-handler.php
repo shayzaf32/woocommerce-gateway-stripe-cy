@@ -36,7 +36,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 	 */
 	public function __construct() {
 		$this->retry_interval = 2;
-		$stripe_settings      = get_option( 'woocommerce_stripe_eu_settings', [] );
+		$stripe_settings      = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, [] );
 		$this->testmode       = ( ! empty( $stripe_settings['testmode'] ) && 'yes' === $stripe_settings['testmode'] ) ? true : false;
 		$secret_key           = ( $this->testmode ? 'test_' : '' ) . 'webhook_secret';
 		$this->secret         = ! empty( $stripe_settings[ $secret_key ] ) ? $stripe_settings[ $secret_key ] : false;
@@ -387,7 +387,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 			return;
 		}
 
-		if ( 'stripe_eu' === $order->get_payment_method() ) {
+		if ( WC_Gateway_Stripe_Eu::ID === $order->get_payment_method() ) {
 			$charge   = $order->get_transaction_id();
 			$captured = $order->get_meta( '_stripe_charge_captured', true );
 
@@ -525,7 +525,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 		}
 
 		// Don't proceed if payment method isn't Stripe.
-		if ( 'stripe_eu' !== $order->get_payment_method() ) {
+		if ( WC_Gateway_Stripe_Eu::ID !== $order->get_payment_method() ) {
 			WC_Stripe_Logger::log( 'Canceled webhook abort: Order was not processed by Stripe: ' . $order->get_id() );
 			return;
 		}
@@ -557,7 +557,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 
 		$order_id = $order->get_id();
 
-		if ( 'stripe_eu' === $order->get_payment_method() ) {
+		if ( WC_Gateway_Stripe_Eu::ID === $order->get_payment_method() ) {
 			$charge        = $order->get_transaction_id();
 			$captured      = $order->get_meta( '_stripe_charge_captured' );
 			$refund_id     = $order->get_meta( '_stripe_refund_id' );
@@ -633,7 +633,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 
 		$order_id = $order->get_id();
 
-		if ( 'stripe_eu' === $order->get_payment_method() ) {
+		if ( WC_Gateway_Stripe_Eu::ID === $order->get_payment_method() ) {
 			$charge     = $order->get_transaction_id();
 			$refund_id  = $order->get_meta( '_stripe_refund_id' );
 			$currency   = $order->get_currency();

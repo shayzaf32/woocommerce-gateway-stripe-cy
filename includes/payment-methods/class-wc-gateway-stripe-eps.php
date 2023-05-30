@@ -8,6 +8,7 @@ use \ElementorStripeEu\{
 	WC_Stripe_Helper,
 	WC_Stripe_Payment_Gateway,
 	WC_Gateway_Stripe_Eu,
+	WC_Stripe_Constants,
 };
 /**
  * Class that handles EPS payment method.
@@ -85,7 +86,7 @@ class WC_Gateway_Stripe_Eps extends WC_Stripe_Payment_Gateway {
 		// Load the settings.
 		$this->init_settings();
 
-		$main_settings              = get_option( 'woocommerce_stripe_eu_settings' );
+		$main_settings              = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$this->title                = $this->get_option( 'title' );
 		$this->description          = $this->get_option( 'description' );
 		$this->enabled              = $this->get_option( 'enabled' );

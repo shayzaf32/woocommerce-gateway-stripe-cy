@@ -33,7 +33,7 @@ class WC_Stripe_Settings_Controller_Test extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		delete_option( 'woocommerce_stripe_eu_settings' );
+		delete_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 
 		parent::tear_down();
 	}
@@ -42,12 +42,12 @@ class WC_Stripe_Settings_Controller_Test extends WP_UnitTestCase {
 	 * Should print a placeholder div with id 'wc-stripe-account-settings-container'
 	 */
 	public function test_admin_options_when_stripe_is_connected() {
-		$stripe_settings                         = get_option( 'woocommerce_stripe_eu_settings' );
+		$stripe_settings                         = get_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$stripe_settings['enabled']              = 'yes';
 		$stripe_settings['testmode']             = 'yes';
 		$stripe_settings['test_publishable_key'] = 'pk_test_key';
 		$stripe_settings['test_secret_key']      = 'sk_test_key';
-		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
+		update_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, $stripe_settings );
 
 		ob_start();
 		$this->controller->admin_options( $this->gateway );
@@ -59,12 +59,12 @@ class WC_Stripe_Settings_Controller_Test extends WP_UnitTestCase {
 	 * Should print a placeholder div with id 'wc-stripe-new-account-container'
 	 */
 	public function test_admin_options_when_stripe_is_not_connected() {
-		$stripe_settings                         = get_option( 'woocommerce_stripe_eu_settings' );
+		$stripe_settings                         = get_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$stripe_settings['enabled']              = 'yes';
 		$stripe_settings['testmode']             = 'yes';
 		$stripe_settings['test_publishable_key'] = '';
 		$stripe_settings['test_secret_key']      = '';
-		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
+		update_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, $stripe_settings );
 
 		ob_start();
 		$this->controller->admin_options( $this->gateway );

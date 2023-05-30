@@ -326,7 +326,7 @@ class WC_Stripe_Customer {
 						if ( WC_Stripe_Helper::is_card_payment_method( $response ) ) {
 							$wc_token = new \WC_Payment_Token_CC();
 							$wc_token->set_token( $response->id );
-							$wc_token->set_gateway_id( 'stripe_eu' );
+							$wc_token->set_gateway_id( WC_Gateway_Stripe_Eu::ID );
 							$wc_token->set_card_type( strtolower( $response->card->brand ) );
 							$wc_token->set_last4( $response->card->last4 );
 							$wc_token->set_expiry_month( $response->card->exp_month );
@@ -338,7 +338,7 @@ class WC_Stripe_Customer {
 				// Legacy.
 				$wc_token = new \WC_Payment_Token_CC();
 				$wc_token->set_token( $response->id );
-				$wc_token->set_gateway_id( 'stripe_eu' );
+				$wc_token->set_gateway_id( WC_Gateway_Stripe_Eu::ID );
 				$wc_token->set_card_type( strtolower( $response->brand ) );
 				$wc_token->set_last4( $response->last4 );
 				$wc_token->set_expiry_month( $response->exp_month );

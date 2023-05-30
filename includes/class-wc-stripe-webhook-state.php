@@ -39,7 +39,7 @@ class WC_Stripe_Webhook_State {
 	 * @return bool
 	 */
 	public static function get_testmode() {
-		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
+		$stripe_settings = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, [] );
 		return ( ! empty( $stripe_settings['testmode'] ) && 'yes' === $stripe_settings['testmode'] ) ? true : false;
 	}
 

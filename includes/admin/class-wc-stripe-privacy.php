@@ -74,7 +74,7 @@ class WC_Stripe_Privacy extends \WC_Abstract_Privacy {
 		$user = get_user_by( 'email', $email_address ); // Check if user has an ID in the DB to load stored personal data.
 
 		$order_query = [
-			'payment_method' => [ 'stripe_eu', 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
+			'payment_method' => [ WC_Gateway_Stripe_Eu::ID, 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
 			'limit'          => 10,
 			'page'           => $page,
 		];
@@ -164,7 +164,7 @@ class WC_Stripe_Privacy extends \WC_Abstract_Privacy {
 			'relation' => 'AND',
 			[
 				'key'     => '_payment_method',
-				'value'   => [ 'stripe_eu', 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
+				'value'   => [ WC_Gateway_Stripe_Eu::ID, 'stripe_alipay', 'stripe_bancontact', 'stripe_eps', 'stripe_giropay', 'stripe_ideal', 'stripe_multibanco', 'stripe_p24', 'stripe_sepa', 'stripe_sofort' ],
 				'compare' => 'IN',
 			],
 			[

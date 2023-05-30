@@ -1,6 +1,7 @@
 <?php
 
 use \ElementorStripeEu\WC_Stripe_Helper;
+use \ElementorStripeEu\WC_Gateway_Stripe_Eu;
 
 /**
  * These tests make assertions against class WC_Stripe_Helper.
@@ -32,12 +33,12 @@ class WC_Stripe_Helper_Test extends WP_UnitTestCase {
 	public function test_should_enqueue_in_current_tab_section() {
 		global $current_tab, $current_section;
 		$current_tab     = 'checkout';
-		$current_section = 'stripe_eu';
+		$current_section = WC_Gateway_Stripe_Eu::ID;
 
-		$result = WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'checkout', 'stripe_eu' );
+		$result = WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'checkout', WC_Gateway_Stripe_Eu::ID );
 		$this->assertTrue( $result );
 
-		$result = WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'onboarding', 'stripe_eu' );
+		$result = WC_Stripe_Helper::should_enqueue_in_current_tab_section( 'onboarding', WC_Gateway_Stripe_Eu::ID );
 		$this->assertFalse( $result );
 
 		unset( $current_tab );

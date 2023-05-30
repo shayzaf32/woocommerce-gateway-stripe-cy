@@ -281,7 +281,7 @@ abstract class WC_Stripe_Payment_Gateway extends \WC_Payment_Gateway_CC {
 	}
 
 	public function save_payment_method_requested() {
-		$payment_method = isset( $_POST['payment_method'] ) ? wc_clean( wp_unslash( $_POST['payment_method'] ) ) : 'stripe_eu';
+		$payment_method = isset( $_POST['payment_method'] ) ? wc_clean( wp_unslash( $_POST['payment_method'] ) ) : WC_Gateway_Stripe_Eu::ID;
 
 		return isset( $_POST[ 'wc-' . $payment_method . '-new-payment-method' ] ) && ! empty( $_POST[ 'wc-' . $payment_method . '-new-payment-method' ] );
 	}
@@ -419,7 +419,7 @@ abstract class WC_Stripe_Payment_Gateway extends \WC_Payment_Gateway_CC {
 	 * @return array()
 	 */
 	public function generate_payment_request( $order, $prepared_payment_method ) {
-		$settings                              = get_option( 'woocommerce_stripe_eu_settings', [] );
+		$settings                              = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, [] );
 		$statement_descriptor                  = ! empty( $settings['statement_descriptor'] ) ? str_replace( "'", '', $settings['statement_descriptor'] ) : '';
 		$short_statement_descriptor            = ! empty( $settings['short_statement_descriptor'] ) ? str_replace( "'", '', $settings['short_statement_descriptor'] ) : '';
 		$is_short_statement_descriptor_enabled = ! empty( $settings['is_short_statement_descriptor_enabled'] ) && 'yes' === $settings['is_short_statement_descriptor_enabled'];
@@ -438,7 +438,7 @@ abstract class WC_Stripe_Payment_Gateway extends \WC_Payment_Gateway_CC {
 		}
 
 		switch ( $order->get_payment_method() ) {
-			case 'stripe_eu':
+			case WC_Gateway_Stripe_Eu::ID:
 				if ( $is_short_statement_descriptor_enabled && ! ( empty( $short_statement_descriptor ) && empty( $statement_descriptor ) ) ) {
 					$post_data['statement_descriptor'] = WC_Stripe_Helper::get_dynamic_statement_descriptor( $short_statement_descriptor, $order, $statement_descriptor );
 				} elseif ( ! empty( $statement_descriptor ) ) {
@@ -762,7 +762,7 @@ abstract class WC_Stripe_Payment_Gateway extends \WC_Payment_Gateway_CC {
 	 * @return bool
 	 */
 	public function is_using_saved_payment_method() {
-		$payment_method = isset( $_POST['payment_method'] ) ? wc_clean( wp_unslash( $_POST['payment_method'] ) ) : 'stripe_eu';
+		$payment_method = isset( $_POST['payment_method'] ) ? wc_clean( wp_unslash( $_POST['payment_method'] ) ) : WC_Gateway_Stripe_Eu::ID;
 
 		return ( isset( $_POST[ 'wc-' . $payment_method . '-payment-token' ] ) && 'new' !== $_POST[ 'wc-' . $payment_method . '-payment-token' ] );
 	}
@@ -790,7 +790,7 @@ abstract class WC_Stripe_Payment_Gateway extends \WC_Payment_Gateway_CC {
 		$source_object     = '';
 		$source_id         = '';
 		$wc_token_id       = false;
-		$payment_method    = isset( $_POST['payment_method'] ) ? wc_clean( wp_unslash( $_POST['payment_method'] ) ) : 'stripe_eu';
+		$payment_method    = isset( $_POST['payment_method'] ) ? wc_clean( wp_unslash( $_POST['payment_method'] ) ) : WC_Gateway_Stripe_Eu::ID;
 		$is_token          = false;
 
 		// New CC info was entered and we have a new source to process.
@@ -943,7 +943,7 @@ abstract class WC_Stripe_Payment_Gateway extends \WC_Payment_Gateway_CC {
 	 */
 	public function check_source( $prepared_source ) {
 		if ( empty( $prepared_source->source ) ) {
-			$localized_message = __( 'Payment processing failed timorr. Please retry.', 'woocommerce-gateway-stripe' );
+			$localized_message = __( 'Payment processing failed. Please retry.', 'woocommerce-gateway-stripe' );
 			throw new WC_Stripe_Exception( print_r( $prepared_source, true ), $localized_message );
 		}
 	}
@@ -1837,8 +1837,8 @@ abstract class WC_Stripe_Payment_Gateway extends \WC_Payment_Gateway_CC {
 		wp_register_style( 'stripe_styles', plugins_url( 'assets/css/stripe-styles.css', WC_STRIPE_EU_MAIN_FILE ), [], WC_STRIPE_EU_VERSION );
 		wp_enqueue_style( 'stripe_styles' );
 
-		wp_register_script( 'stripe_eu', 'https://js.stripe.com/v3/', '', '3.0', true );
-		wp_register_script( 'woocommerce_stripe_eu', plugins_url( 'assets/js/stripe' . $suffix . '.js', WC_STRIPE_EU_MAIN_FILE ), [ 'jquery-payment', 'stripe_eu' ], WC_STRIPE_EU_VERSION, true );
+		wp_register_script( WC_Gateway_Stripe_Eu::ID, 'https://js.stripe.com/v3/', '', '3.0', true );
+		wp_register_script( 'woocommerce_stripe_eu', plugins_url( 'assets/js/stripe' . $suffix . '.js', WC_STRIPE_EU_MAIN_FILE ), [ 'jquery-payment', WC_Gateway_Stripe_Eu::ID ], WC_STRIPE_EU_VERSION, true );
 
 		wp_localize_script(
 			'woocommerce_stripe_eu',

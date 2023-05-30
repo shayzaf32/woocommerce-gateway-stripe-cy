@@ -153,6 +153,7 @@ function woocommerce_gateway_stripe_eu() {
 					require_once dirname( __FILE__ ) . '/includes/admin/class-wc-stripe-privacy.php';
 				}
 
+				require_once dirname( __FILE__ ) . '/includes/constants/class-wc-stripe-constants.php';
 				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-feature-flags.php';
 				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-upe-compatibility.php';
 				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-exception.php';
@@ -265,8 +266,8 @@ function woocommerce_gateway_stripe_eu() {
 			 * @version 4.0.0
 			 */
 			public function update_plugin_version() {
-				delete_option( 'wc_stripe_cy_version' );
-				update_option( 'wc_stripe_cy_version', WC_STRIPE_EU_VERSION );
+				delete_option( 'wc_stripe_eu_version' );
+				update_option( 'wc_stripe_eu_version', WC_STRIPE_EU_VERSION );
 			}
 
 			/**
@@ -280,7 +281,7 @@ function woocommerce_gateway_stripe_eu() {
 					return;
 				}
 
-				if ( ! defined( 'IFRAME_REQUEST' ) && ( WC_STRIPE_EU_VERSION !== get_option( 'wc_stripe_cy_version' ) ) ) {
+				if ( ! defined( 'IFRAME_REQUEST' ) && ( WC_STRIPE_EU_VERSION !== get_option( 'wc_stripe_eu_version' ) ) ) {
 					do_action( 'woocommerce_stripe_updated' );
 
 					if ( ! defined( 'WC_STRIPE_INSTALLING' ) ) {
@@ -308,7 +309,7 @@ function woocommerce_gateway_stripe_eu() {
 			 * @version 5.5.0
 			 */
 			public function update_prb_location_settings() {
-				$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
+				$stripe_settings = get_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, [] );
 				$prb_locations   = isset( $stripe_settings['payment_request_button_locations'] )
 					? $stripe_settings['payment_request_button_locations']
 					: [];
@@ -334,7 +335,7 @@ function woocommerce_gateway_stripe_eu() {
 					}
 
 					$stripe_settings['payment_request_button_locations'] = $new_prb_locations;
-					update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
+					update_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, $stripe_settings );
 				}
 			}
 
@@ -406,7 +407,7 @@ function woocommerce_gateway_stripe_eu() {
 			 * @version 4.0.0
 			 */
 			public function filter_gateway_order_admin( $sections ) {
-				unset( $sections['stripe_eu'] );
+				unset( $sections[ \ElementorStripeEu\WC_Gateway_Stripe_Eu::ID ] );
 				if ( \ElementorStripeEu\WC_Stripe_Feature_Flags::is_upe_preview_enabled() ) {
 					unset( $sections['stripe_upe'] );
 				}
@@ -420,7 +421,7 @@ function woocommerce_gateway_stripe_eu() {
 				unset( $sections['stripe_sepa'] );
 				unset( $sections['stripe_multibanco'] );
 
-				$sections['stripe_eu'] = 'Stripe Eu';
+				$sections[ \ElementorStripeEu\WC_Gateway_Stripe_Eu::ID ] = 'Stripe Europe';
 				if ( \ElementorStripeEu\WC_Stripe_Feature_Flags::is_upe_preview_enabled() ) {
 					$sections['stripe_upe'] = 'Stripe checkout experience';
 				}
@@ -499,7 +500,7 @@ function woocommerce_gateway_stripe_eu() {
 					$lpm_gateway_id = constant( $method_class::LPM_GATEWAY_CLASS . '::ID' );
 					if ( isset( $payment_gateways[ $lpm_gateway_id ] ) && 'yes' === $payment_gateways[ $lpm_gateway_id ]->enabled ) {
 						// DISABLE LPM
-						if ( 'stripe_eu' !== $lpm_gateway_id ) {
+						if ( \ElementorStripeEu\WC_Gateway_Stripe_Eu::ID !== $lpm_gateway_id ) {
 							/**
 							 * TODO: This can be replaced with:
 							 *
@@ -522,7 +523,7 @@ function woocommerce_gateway_stripe_eu() {
 				if ( empty( $settings['upe_checkout_experience_accepted_payments'] ) ) {
 					$settings['upe_checkout_experience_accepted_payments'] = [ 'card' ];
 				} else {
-					// The 'stripe_eu' gateway must be enabled for UPE if any LPMs were enabled.
+					// The 'stripe-eu' gateway must be enabled for UPE if any LPMs were enabled.
 					$settings['enabled'] = 'yes';
 				}
 
@@ -741,7 +742,7 @@ function woocommerce_gateway_stripe_cy_woocommerce_block_support() {
 		require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-blocks-support.php';
 		// priority is important here because this ensures this integration is
 		// registered before the WooCommerce Blocks built-in Stripe registration.
-		// Blocks code has a check in place to only register if 'stripe_eu' is not
+		// Blocks code has a check in place to only register if 'stripe-eu' is not
 		// already registered.
 		add_action(
 			'woocommerce_blocks_payment_method_type_registration',

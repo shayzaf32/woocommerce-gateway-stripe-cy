@@ -220,7 +220,7 @@ class WC_Stripe_Order_Handler extends WC_Stripe_Payment_Gateway {
 	public function capture_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( 'stripe_eu' === $order->get_payment_method() ) {
+		if ( WC_Gateway_Stripe_Eu::ID === $order->get_payment_method() ) {
 			$charge             = $order->get_transaction_id();
 			$captured           = $order->get_meta( '_stripe_charge_captured', true );
 			$is_stripe_captured = false;
@@ -324,7 +324,7 @@ class WC_Stripe_Order_Handler extends WC_Stripe_Payment_Gateway {
 	public function cancel_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( 'stripe_eu' === $order->get_payment_method() ) {
+		if ( WC_Gateway_Stripe_Eu::ID === $order->get_payment_method() ) {
 			$captured = $order->get_meta( '_stripe_charge_captured', true );
 			if ( 'no' === $captured ) {
 				$this->process_refund( $order_id );
@@ -360,13 +360,13 @@ class WC_Stripe_Order_Handler extends WC_Stripe_Payment_Gateway {
 		}
 
 		// Not stripe? Bail.
-		if ( 'stripe_eu' != $properties['payment_method'] ) {
+		if ( WC_Gateway_Stripe_Eu::ID != $properties['payment_method'] ) {
 			return $properties;
 		}
 
 		// Due diligence done. Collect the metadata.
 		$is_live         = true;
-		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
+		$stripe_settings = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, [] );
 		if ( array_key_exists( 'testmode', $stripe_settings ) ) {
 			$is_live = 'no' === $stripe_settings['testmode'];
 		}

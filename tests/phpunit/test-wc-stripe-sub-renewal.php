@@ -49,19 +49,19 @@ class WC_Stripe_Subscription_Renewal_Test extends WP_UnitTestCase {
 
 		$this->statement_descriptor = 'This is a statement descriptor.';
 
-		$stripe_settings = get_option( 'woocommerce_stripe_eu_settings', [] );
+		$stripe_settings = get_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, [] );
 		// Disable UPE.
 		$stripe_settings[ \ElementorStripeEu\WC_Stripe_Feature_Flags::UPE_CHECKOUT_FEATURE_ATTRIBUTE_NAME ] = 'no';
 		// Set statement descriptor.
 		$stripe_settings['statement_descriptor'] = $this->statement_descriptor;
-		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
+		update_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, $stripe_settings );
 	}
 
 	/**
 	 * Tears down the stuff we set up.
 	 */
 	public function tear_down() {
-		delete_option( 'woocommerce_stripe_eu_settings' );
+		delete_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 
 		parent::tear_down();
 	}
@@ -90,7 +90,7 @@ class WC_Stripe_Subscription_Renewal_Test extends WP_UnitTestCase {
 		$payments_intents_api_endpoint = 'https://api.stripe.com/v1/payment_intents';
 		$urls_used                     = [];
 
-		$renewal_order->set_payment_method( 'stripe_eu' );
+		$renewal_order->set_payment_method( 'stripe-eu' );
 
 		// Arrange: Mock prepare_order_source() so that we have a customer and source.
 		$this->wc_gateway_stripe

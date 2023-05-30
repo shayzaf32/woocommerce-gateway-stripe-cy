@@ -97,7 +97,7 @@ class WC_Stripe_Payment_Tokens {
 	 * @return bool
 	 */
 	public static function customer_has_saved_methods( $customer_id ) {
-		$gateways = [ 'stripe_eu', 'stripe_sepa' ];
+		$gateways = [ WC_Gateway_Stripe_Eu::ID, 'stripe_sepa' ];
 
 		if ( empty( $customer_id ) ) {
 			return false;
@@ -150,7 +150,7 @@ class WC_Stripe_Payment_Tokens {
 				$stored_tokens[ $token->get_token() ] = $token;
 			}
 
-			if ( 'stripe_eu' === $gateway_id ) {
+			if ( WC_Gateway_Stripe_Eu::ID === $gateway_id ) {
 				$stripe_customer = new \ElementorStripeEu\WC_Stripe_Customer( $customer_id );
 				$stripe_sources  = $stripe_customer->get_sources();
 
@@ -159,7 +159,7 @@ class WC_Stripe_Payment_Tokens {
 						if ( ! isset( $stored_tokens[ $source->id ] ) ) {
 							$token = new \WC_Payment_Token_CC();
 							$token->set_token( $source->id );
-							$token->set_gateway_id( 'stripe_eu' );
+							$token->set_gateway_id( WC_Gateway_Stripe_Eu::ID );
 
 							if ( WC_Stripe_Helper::is_card_payment_method( $source ) ) {
 								$token->set_card_type( strtolower( $source->card->brand ) );
@@ -178,7 +178,7 @@ class WC_Stripe_Payment_Tokens {
 						if ( ! isset( $stored_tokens[ $source->id ] ) && 'card' === $source->object ) {
 							$token = new \WC_Payment_Token_CC();
 							$token->set_token( $source->id );
-							$token->set_gateway_id( 'stripe_eu' );
+							$token->set_gateway_id( WC_Gateway_Stripe_Eu::ID );
 							$token->set_card_type( strtolower( $source->brand ) );
 							$token->set_last4( $source->last4 );
 							$token->set_expiry_month( $source->exp_month );
@@ -370,7 +370,7 @@ class WC_Stripe_Payment_Tokens {
 				$stripe_customer->detach_payment_method( $token->get_token() );
 			}
 		} else {
-			if ( 'stripe_eu' === $token->get_gateway_id() || 'stripe_sepa' === $token->get_gateway_id() ) {
+			if ( WC_Gateway_Stripe_Eu::ID === $token->get_gateway_id() || 'stripe_sepa' === $token->get_gateway_id() ) {
 				$stripe_customer->delete_source( $token->get_token() );
 			}
 		}
@@ -391,7 +391,7 @@ class WC_Stripe_Payment_Tokens {
 				$stripe_customer->set_default_payment_method( $token->get_token() );
 			}
 		} else {
-			if ( 'stripe_eu' === $token->get_gateway_id() || 'stripe_sepa' === $token->get_gateway_id() ) {
+			if ( WC_Gateway_Stripe_Eu::ID === $token->get_gateway_id() || 'stripe_sepa' === $token->get_gateway_id() ) {
 				$stripe_customer->set_default_source( $token->get_token() );
 			}
 		}

@@ -12,7 +12,7 @@ if ( ! class_exists( '\ElementorStripeEu\WC_Stripe_Connect' ) ) {
 	 */
 	class WC_Stripe_Connect {
 
-		const SETTINGS_OPTION = 'woocommerce_stripe_eu_settings';
+		const SETTINGS_OPTION = 'woocommerce_stripe-eu_settings';
 
 		/**
 		 * Stripe connect api.

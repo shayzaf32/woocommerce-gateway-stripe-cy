@@ -42,7 +42,7 @@ class WC_Stripe_Subscription_Initial_Test extends WP_UnitTestCase {
 		// Mocked in order to get metadata[payment_type] = recurring in the HTTP request.
 		$this->statement_descriptor = 'This is a statement descriptor.';
 		update_option(
-			'woocommerce_stripe_eu_settings',
+			\ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME,
 			[
 				'statement_descriptor' => $this->statement_descriptor,
 			]
@@ -53,7 +53,7 @@ class WC_Stripe_Subscription_Initial_Test extends WP_UnitTestCase {
 	 * Tears down the stuff we set up.
 	 */
 	public function tear_down() {
-		delete_option( 'woocommerce_stripe_eu_settings' );
+		delete_option( \ElementorStripeEu\WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 
 		parent::tear_down();
 	}
@@ -79,7 +79,7 @@ class WC_Stripe_Subscription_Initial_Test extends WP_UnitTestCase {
 		$intents_api_endpoint = 'https://api.stripe.com/v1/payment_intents';
 		$urls_used            = [];
 
-		$initial_order->set_payment_method( 'stripe_eu' );
+		$initial_order->set_payment_method( 'stripe-eu' );
 		$initial_order->save();
 
 		// Arrange: Mock prepare_source() so that we have a customer and source.

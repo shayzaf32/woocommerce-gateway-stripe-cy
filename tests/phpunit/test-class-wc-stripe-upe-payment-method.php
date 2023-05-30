@@ -1,6 +1,8 @@
 <?php
 
 use \ElementorStripeEu\WC_Stripe_UPE_Payment_Method_Link;
+use \ElementorStripeEu\WC_Gateway_Stripe_Eu;
+use \ElementorStripeEu\WC_Stripe_Constants;
 
 /**
  * Unit tests for UPE payment methods
@@ -302,9 +304,9 @@ class WC_Stripe_UPE_Payment_Method_Test extends WP_UnitTestCase {
 		$this->set_mock_payment_method_return_value( 'get_capabilities_response', self::MOCK_INACTIVE_CAPABILITIES_RESPONSE );
 
 		// Disable testmode.
-		$stripe_settings             = get_option( 'woocommerce_stripe_eu_settings' );
+		$stripe_settings             = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$stripe_settings['testmode'] = 'no';
-		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
+		update_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, $stripe_settings );
 
 		$card_method       = $this->mock_payment_methods['card'];
 		$giropay_method    = $this->mock_payment_methods['giropay'];
@@ -334,9 +336,9 @@ class WC_Stripe_UPE_Payment_Method_Test extends WP_UnitTestCase {
 	 */
 	public function test_payment_methods_are_only_enabled_when_capability_is_active() {
 		// Disable testmode.
-		$stripe_settings             = get_option( 'woocommerce_stripe_eu_settings' );
+		$stripe_settings             = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 		$stripe_settings['testmode'] = 'no';
-		update_option( 'woocommerce_stripe_eu_settings', $stripe_settings );
+		update_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME, $stripe_settings );
 
 		$payment_method_ids = array_map( [ $this, 'get_id' ], $this->mock_payment_methods );
 		foreach ( $payment_method_ids as $id ) {

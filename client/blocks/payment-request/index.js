@@ -55,7 +55,7 @@ const paymentRequestPaymentMethod = {
 			return paymentRequest.canMakePayment();
 		} );
 	},
-	paymentMethodId: 'stripe_eu',
+	paymentMethodId: 'stripe-eu',
 	supports: {
 		features: getBlocksConfiguration()?.supports ?? [],
 	},

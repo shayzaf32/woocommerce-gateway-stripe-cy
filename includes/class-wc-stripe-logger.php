@@ -33,7 +33,7 @@ class WC_Stripe_Logger {
 				self::$logger = wc_get_logger();
 			}
 
-			$settings = get_option( 'woocommerce_stripe_eu_settings' );
+			$settings = get_option( WC_Stripe_Constants::STRIPE_EU_SETTINGS_OPTION_NAME );
 
 			if ( empty( $settings ) || isset( $settings['logging'] ) && 'yes' !== $settings['logging'] ) {
 				return;
